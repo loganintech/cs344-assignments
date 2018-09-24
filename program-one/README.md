@@ -108,7 +108,9 @@ Though optional, I do recommend that you use temporary files; arrays are not rec
 
 All values and results are and must be integers. You may use the expr command to do your calculations, or any other bash shell scripting method, such as ((expr)). Do not use any other languages other than bash shell scripting: this means that, among others, awk, sed, tcl, bc, perl, & the python languages and tools are off-limits for this assignment. Note that expr only works with whole numbers. When you calculate the average you must round to the nearest integer, where half values round away from 0 (i.e. 7.5 rounds up to 8, but -7.5 rounds down to -8). This is the most common form of rounding. When doing truncating integer division (as bash does), this formula works to divide two numbers and end up with the proper rounding:
 
-`(a + (b/2)*( (a>0)*2-1 )) / b`
+```
+(a + (b/2)*( (a>0)*2-1 )) / b
+```
 
 You can learn more about rounding methods here:
 
@@ -121,11 +123,15 @@ p1gradingscript
 
 To use the script, just place it in the same directory as your matrix script and run it like this:
 
-`$ ./p1gradingscript matrix`
+```
+$ ./p1gradingscript matrix
+```
 
 Be aware that this script might take a minute or two to run, depending on how speedy your algorithms and code are, since there's a lot of matrix math in there. The grading script has generous time-outs for each test -- if your script takes too long to complete a command, the test will time out and you will receive 0 points for that particular test. If you have any doubt about your running time being acceptable, just add a note into your code as a comment at the top to warn the TA. When we run your script for grading, we will do this to put your results into a file we can examine more easily:
 
-`$ ./p1gradingscript matrix > grading_result.username`
+```
+$ ./p1gradingscript matrix > grading_result.username
+```
 
 To compare yours to a perfect solution, you can download here a completely correct run of the script that shows what you should get if everything is working correctly:
 
@@ -163,14 +169,17 @@ Your script must support the following operations:
     - Argument count is 2 but the file named by either argument is not readable (e.g. `matrix multiply m1 no_such_file`).
     - The dimensions of the input matrices do not allow them to be multiplied together following the rules of matrix multiplication.
   - Otherwise, prints the product of both matricies, with the first argument as the left matrix and the second argumentas the right matrix, in a valid matrix format to stdout, nothing to stderr, and returns 0. (`matrix multiply A B` should return A*B, not B*A)
-`
+
 
 An invalid command must result in an error message to stderr, nothing to stdout, and a return value != 0.
 
 # Hints
 - Try writing each part as a separate function (see the 1.4 bash Functions reading). You can use $1 "${@:2}" to call the function named by argument 1, with the remaining arguments passed to it. For example, matrix multiply m1 m2 will expand $1 "${@:2}" to multiply m1 m2 inside your script, which will call the function named "multiply". This fancy bash method of calling functions would go at the bottom of your script, after the functions are defined.
 - You'll need to use the read command extensively to read in data from a file. Note that it reads in one line at a time from the stdin buffer and stores the line in a variable called REPLY, unless specified. Generally, read is used in a while loop, where a file is redirected to stdin of the while loop. Calling read < myfile multiple times will repeatedly read the first line of myfile.
-- The expr command and the shell can have conflicts over special characters.  If you try expr 5 * ( 4 + 2 ), the shell will think * is a filename wild card and the parentheses mean command grouping. You have to use backslashes, like this: `expr 5 \* \( 4 + 2 \)`
+- The expr command and the shell can have conflicts over special characters.  If you try expr 5 * ( 4 + 2 ), the shell will think * is a filename wild card and the parentheses mean command grouping. You have to use backslashes, like this:
+```
+expr 5 \* \( 4 + 2 \)
+```
 
 - I highly recommend that you develop this program directly on the class server (os1). Doing so will prevent you from having problems transferring the program back and forth, which can cause compatibility issues. Keep in mind that students caught developing on flip risk losing points on the assignment. If you are using Windows as your operating system, windows may replace newlines in files with newline-carriage returns. These will be displayed as ^M characters in vim. To remove them, use the utility dos2unix. `$ dos2unix bustedFile`
 - Consider the following snippet of code. This will allow you to use one variable to hold the path to a file with passed-in contents, no matter if they came via stdin or via a file specified on the command line:
