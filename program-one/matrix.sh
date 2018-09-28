@@ -15,7 +15,7 @@ then
         lines=`expr $lines + 1`
     done < ${2:-/dev/stdin}
 
-
+    cols=`awk '{print NF}' $line | sort -nu | tail -n 1`
 
     echo "$lines $cols"
 fi
