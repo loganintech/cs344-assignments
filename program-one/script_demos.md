@@ -1,6 +1,6 @@
 # Readloop
 ```sh
-$cat readloop
+$ cat readloop
 #!/bin/bash
 while read myLine
 do
