@@ -25,6 +25,7 @@ $ cat test_file
 *Note*: This is not the bash way of doing things. Prof has suggested not to use this.
 
 ```sh
+$ cat arrayloop
 #!/bin/bash
 array=( one two three )
 for i in "${array[@]}"
