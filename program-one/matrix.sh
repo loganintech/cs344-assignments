@@ -64,12 +64,51 @@ mult () {
     done
 }
 
-if [[ "$1" = "dims" && ( ("$#" -eq 1 && -n ${-/dev/stdin}) || "$#" -eq "2") ]]
+transpose () {
+    trandims=`dims $1`
+}
+
+if [[ "$1" = "dims" ]]
 then
+    # If we don't have two params or don't have one param w/  stdin
+    if [[ !( ("$#" -eq 1 && -n ${-/dev/stdin}) || "$#" -eq 2) ]]
+    then
+        echo "Bad params" >&2
+        exit 1
+    fi
+
+    if [[ ! (-f $2 ||"$#" -eq 1)  ]]
+    then
+        echo "File not found" >&2
+        exit 2
+    fi
+
     dims ${2:-/dev/stdin}
+    exit 0
 elif [ "$1" = "add" ]
 then
-    # echo "Add"
+
+    if [[ !("$#" -eq 3) ]]
+    then
+        echo "Bad params" >&2
+        exit 1
+    fi
+
+    if [[ !(-f $2 || -f $3) ]]
+    then
+        echo "File not found" >&2
+        exit 2
+    fi
+
+    dims1=`dims $2`
+    dims2=`dims $3`
+
+    if [[ "$dims1" != "$dims2" ]]
+    then
+        echo "Matricy size mismatch" >&2
+        exit 3
+    fi
+
     add $2 $3
     exit 0
 elif [ "$1" = "mean" ]
@@ -78,12 +117,48 @@ then
     # mean ${2:-/dev/stdin}
 elif [ "$1" = "multiply" ]
 then
+    if [[ !("$#" -eq 3) ]]
+    then
+        echo "Bad params" >&2
+        exit 1
+    fi
+
+    if [[ !(-f $2 || -f $3) ]]
+    then
+        echo "File not found" >&2
+        exit 2
+    fi
+
+    dims1=`dims $2`
+    dims2=`dims $3`
+
+    if [[ "$dims1" != "$dims2" ]]
+    then
+        echo "Cannot multiply these matricies" >&2
+        exit 3
+    fi
     # echo "Mult"
     mult $2 $3
     exit 0
 elif [ "$1" = "transpose" ]
 then
     echo "Transpose"
+
+    # If we don't have two params or don't have one param w/  stdin
+    if [[ !"$#" -eq 2 ]]
+    then
+        echo "Bad params" >&2
+        exit 1
+    fi
+
+    if [[ !(-f $2)  ]]
+    then
+        echo "File not found" >&2
+        exit 2
+    fi
+
+    transpose $2
+
 else
     echo "That is not a valid command."
 fi
