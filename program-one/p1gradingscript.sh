@@ -68,15 +68,15 @@ err(){
 }
 
 
-if [ $# -ge 1 ] 
+if [ $# -ge 1 ]
 then
 	if [ -f $1 ]
-	then 
+	then
 		cmd=$1
 	else
 		err "Given file not found."
 	fi
-		
+
 else
 	err "Usage: $0 [bash_program_file]"
 fi
@@ -103,7 +103,7 @@ outpipe2="$(mktemp stdout.XXXXX)"
 errpipe="$(mktemp stderr.XXXXX)"
 errpipe2="$(mktemp stderr.XXXXX)"
 
-trap "rm -rf $m1 $m2 $m3 $m4 $m5 $outpipe $outpipe2 $errpipe $errpipe2; trap - EXIT" INT HUP TERM EXIT 
+trap "rm -rf $m1 $m2 $m3 $m4 $m5 $outpipe $outpipe2 $errpipe $errpipe2; trap - EXIT" INT HUP TERM EXIT
 
 result=0
 
@@ -128,7 +128,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -eq 0 ]
@@ -136,7 +136,7 @@ else
 		score=0
 		echo -e "\u26D4 Returned 0"
 	fi
-	if [ -s "$outpipe" ] 
+	if [ -s "$outpipe" ]
 	then
 		score=0
 		echo -e "\u26D4 stdout is non-empty"
@@ -168,7 +168,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -eq 0 ]
@@ -176,7 +176,7 @@ else
 		score=0
 		echo -e "\u26D4 Returned 0"
 	fi
-	if [ -s "$outpipe" ] 
+	if [ -s "$outpipe" ]
 	then
 		score=0
 		echo -e "\u26D4 stdout is non-empty"
@@ -208,7 +208,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -eq 0 ]
@@ -216,7 +216,7 @@ else
 		score=0
 		echo -e "\u26D4 Returned 0"
 	fi
-	if [ -s "$outpipe" ] 
+	if [ -s "$outpipe" ]
 	then
 		score=0
 		echo -e "\u26D4 stdout is non-empty"
@@ -248,7 +248,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -eq 0 ]
@@ -256,7 +256,7 @@ else
 		score=0
 		echo -e "\u26D4 Returned 0"
 	fi
-	if [ -s "$outpipe" ] 
+	if [ -s "$outpipe" ]
 	then
 		score=0
 		echo -e "\u26D4 stdout is non-empty"
@@ -289,7 +289,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -eq 0 ]
@@ -297,7 +297,7 @@ else
 		score=0
 		echo -e "\u26D4 Returned 0"
 	fi
-	if [ -s "$outpipe" ] 
+	if [ -s "$outpipe" ]
 	then
 		score=0
 		echo -e "\u26D4 stdout is non-empty"
@@ -330,7 +330,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -eq 0 ]
@@ -338,7 +338,7 @@ else
 		score=0
 		echo -e "\u26D4 Returned 0"
 	fi
-	if [ -s "$outpipe" ] 
+	if [ -s "$outpipe" ]
 	then
 		score=0
 		echo -e "\u26D4 stdout is non-empty"
@@ -370,7 +370,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -eq 0 ]
@@ -378,7 +378,7 @@ else
 		score=0
 		echo -e "\u26D4 Returned 0"
 	fi
-	if [ -s "$outpipe" ] 
+	if [ -s "$outpipe" ]
 	then
 		score=0
 		echo -e "\u26D4 stdout is non-empty"
@@ -410,7 +410,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -451,7 +451,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -492,7 +492,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -533,7 +533,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -574,7 +574,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -615,7 +615,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -696,7 +696,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -723,7 +723,7 @@ fi
 ((points+=score))
 
 
-echo "Transpose involution test on m3 (5pt):" 
+echo "Transpose involution test on m3 (5pt):"
 score=5
 SECONDS=0
 ./"$cmd" transpose "$m3" 1>"$outpipe" 2>"$errpipe" &
@@ -737,7 +737,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -763,7 +763,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -790,7 +790,7 @@ fi
 ((points+=score))
 
 
-echo "Transpose involution test on m4 (5pt):" 
+echo "Transpose involution test on m4 (5pt):"
 score=5
 SECONDS=0
 ./"$cmd" transpose "$m4" 1>"$outpipe" 2>"$errpipe" &
@@ -804,7 +804,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -830,7 +830,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -857,7 +857,7 @@ fi
 ((points+=score))
 
 
-echo "Transpose involution test on m5 (5pt):" 
+echo "Transpose involution test on m5 (5pt):"
 score=5
 SECONDS=0
 ./"$cmd" transpose "$m5" 1>"$outpipe" 2>"$errpipe" &
@@ -871,7 +871,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -897,7 +897,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -979,7 +979,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -1022,7 +1022,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -1065,7 +1065,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -1108,7 +1108,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -1151,7 +1151,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -1194,7 +1194,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -1237,7 +1237,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -1280,7 +1280,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -1306,7 +1306,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -1407,7 +1407,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -1450,7 +1450,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -1493,7 +1493,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -1537,7 +1537,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
@@ -1657,7 +1657,7 @@ if
 then
 	echo -e "\u26D4 Hung process (killed)"
 	score=0
-else 
+else
 	wait $!
 	result=$?
 	if [ "$result" -ne 0 ]
