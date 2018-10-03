@@ -14,7 +14,7 @@ dims () {
         lines=$(( $lines + 1 ))
     done < $1
 
-    cols=`head -n1 $1 | grep -o -P "\t" | wc -l`
+    cols=`echo $latestline | grep -o " " | wc -l`
     cols=`expr $cols + 1`
 
     echo -e "$lines $cols"
@@ -64,7 +64,7 @@ then
     if [[ ! (-f $2 || ("$#" -eq 1 && -n ${-/dev/stdin})) ]]
     then
         echo "File not found" >&2
-        exit 3
+        exit 2
     fi
 
     dims ${2:-/dev/stdin}
