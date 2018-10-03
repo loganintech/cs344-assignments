@@ -13,7 +13,9 @@ dims () {
         latestline=$line
         lines=$(( $lines + 1 ))
     done < $1
-    cols=`awk '{print NF}' <<< $latestline | sort -nu | tail -n 1`
+
+    cols=`head -n1 $1 | grep -o -P "\t" | wc -l`
+    cols=`expr $cols + 1`
 
     echo -e "$lines $cols"
 }
@@ -42,9 +44,9 @@ add () {
     done
 }
 
-mult () {
+# mult () {
 
-}
+# }
 
 transpose () {
     trandims=`dims $1`
@@ -59,10 +61,10 @@ then
         exit 1
     fi
 
-    if [[ ! (-f $2 ||"$#" -eq 1)  ]]
+    if [[ ! (-f $2 || ("$#" -eq 1 && -n ${-/dev/stdin})) ]]
     then
         echo "File not found" >&2
-        exit 2
+        exit 3
     fi
 
     dims ${2:-/dev/stdin}
