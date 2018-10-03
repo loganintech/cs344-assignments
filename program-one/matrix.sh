@@ -43,25 +43,7 @@ add () {
 }
 
 mult () {
-    thedims=$(dims $1)
-    cutrows=`echo $thedims | cut -c 1`
-    cutcols=`echo $thedims | cut -c 3`
 
-    for ((i=1;i<$cutcols;i++))
-    do
-        lineone=`head -n $i < $1 | tail -n 1`
-        linetwo=`head -n $i < $2 | tail -n 1`
-        # echo "Lineone: $lineone"
-        # echo "Linetwo: $linetwo"
-        for ((x=1;x<$cutcols*2;x+=2))
-        do
-
-            colone=`echo $lineone | cut -c $x`
-            coltwo=`echo $linetwo | cut -c $x`
-            echo -n -e "$(( $colone * $coltwo ))\t"
-        done
-        echo ""
-    done
 }
 
 transpose () {
