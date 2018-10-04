@@ -49,7 +49,29 @@ add () {
 # }
 
 transpose () {
-    trandims=`dims $1`
+
+    thedims=`dims $1`
+    cols=`dims $1 | cut -c 3`
+    # echo $cols
+
+    for ((i=1;i<=$cols;i++))
+    do
+        aftercut=`cut -f$i $1`
+        # echo Aftercut: $aftercut
+        afterpaste=`echo $aftercut | paste -s`
+        # echo Afterpaste: $afterpaste
+
+        echo $afterpaste
+
+        # echo -n $afterpaste
+
+        # if [[ ! ("$i" -eq $cols) ]]
+        # then
+        #     echo ""
+        # fi
+
+    done
+
 }
 
 if [[ "$1" = "dims" ]]
@@ -126,8 +148,6 @@ then
     exit 0
 elif [ "$1" = "transpose" ]
 then
-    echo "Transpose"
-
     # If we don't have two params or don't have one param w/  stdin
     if [[ !"$#" -eq 2 ]]
     then
@@ -141,9 +161,16 @@ then
         exit 2
     fi
 
-    transpose $2
+    if [[ ! (-r $2) ]]
+    then
+        echo "File cannot be read" >&2
+        exit 3
+    fi
 
+    transpose $2
+    exit 0
 else
-    echo "That is not a valid command."
+    echo "That is not a valid command." >&2
+    exit 1
 fi
 
