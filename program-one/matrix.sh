@@ -49,49 +49,38 @@ add () {
 
 mult () {
 	firstdims=`dims $1`
-	firstrows=`echo $firstdims | cut -c 1`
-	firstcols=`echo $firstdims | cut -c 3`
+	firstrows=`echo $firstdims | cut -d " " -f 1`
+	firstcols=`echo $firstdims | cut -d " " -f 2`
 	# echo First dims: $firstdims, First Rows: $firstrows, First Cols: $firstcols
 
 	seconddims=`dims $2`
-	secondrows=`echo $seconddims | cut -c 1`
-	secondcols=`echo $seconddims | cut -c 3`
+	secondrows=`echo $seconddims | cut -d " " -f 1`
+	secondcols=`echo $seconddims | cut -d " " -f 2`
 	# echo Second dims: $seconddims, Second Rows: $secondrows, Second Cols: $secondcols
 
 
 	# For every row in the first matrix
-	for ((i=1;i<=$firstrows;i++))
+	for i in `seq 1 $firstrows`
 	do
 		# Get a column from the second
-		for ((x=1;x<=$secondcols;x++))
+		for x in `seq 1 $secondcols`
 		do
 			runningtotal=0
 			#Go down each number from the second
-			for ((j=1;j<=$firstcols;j++))
+			for j in `seq 1 $firstcols`
 			do
-				# echo First Row Index: $i
-				# echo Second Col Index: $x
-				# echo Second Row Index: $j
 				firstafterheadtail=`head -n $i < $1 | tail -n 1`
-				# echo First After Head/Tail $firstafterheadtail
 				firstnum=`echo $firstafterheadtail | cut -d " " -f $j`
-
 				secondafterheadtail=`head -n $j < $2 | tail -n 1`
-				# echo After Head/Tail: $secondafterheadtail
 				secondnum=`echo $secondafterheadtail | cut -d " " -f $x`
-
-				# echo Second Num after Cut: $secondnum
-				# echo First Num: $firstnum
-				# echo Second Num: $secondnum
-				# echo Multiplying $firstnum and $secondnum
 				numsum=$(($firstnum * $secondnum))
 				runningtotal=`expr $runningtotal + $numsum`
 			done
-			echo -n -e "$runningtotal"
+			echo -ne "$runningtotal"
 			#Don't want to add a tab at the end
 			if [[ $x != $secondcols ]]
 			then
-				echo -n -e "\t"
+				echo -ne "\t"
 			fi
 		done
 		echo
@@ -113,7 +102,7 @@ transpose () {
 			echo -n `echo $cutcol | cut -d " " -f $rowvar`
 			if [[ $rowvar != $rows ]]
 			then
-				echo -n -e "\t"
+				echo -ne "\t"
 			fi
 		done
 		echo
@@ -135,7 +124,13 @@ mean () {
 			# echo Curval: $curval
 			runningtotal=`expr $runningtotal + $curval`
 		done
-		echo -n "$(($runningtotal/$rows))"
+		# echo Running total: $runningtotal
+		resultval="$(( $(( $runningtotal + $(($rows/2)) )) / $rows))"
+		if [[ $resultval -lt 0 ]]
+		then
+			resultval=`expr $resultval - 1`
+		fi
+		echo -n $resultval
 		if [[ $colvar != $cols ]]
 		then
 			echo -ne "\t"
