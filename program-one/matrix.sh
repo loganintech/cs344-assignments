@@ -13,7 +13,6 @@ dims () {
 		latestline=$line
 		lines=$(( $lines + 1 ))
 	done < $1
-
 	cols=`echo $latestline | grep -o " " | wc -l`
 	cols=`expr $cols + 1`
 
@@ -24,22 +23,27 @@ dims () {
 # $2 is the second matrix
 add () {
 	thedims=$(dims $1)
-	cutcols=`echo $thedims | cut -c 3`
+	cutcols=`echo $thedims | cut -d " " -f 2`
+	cutrows=`echo $thedims | cut -d " " -f 1`
 
-	for ((i=1;i<$cutcols;i++))
+	for ((i=1;i<=$cutrows;i++))
 	do
 		lineone=`head -n $i < $1 | tail -n 1`
 		linetwo=`head -n $i < $2 | tail -n 1`
 		# echo "Lineone: $lineone"
 		# echo "Linetwo: $linetwo"
-		for ((x=1;x<$cutcols*2;x+=2))
+		for ((x=1;x<=$cutcols;x++))
 		do
 
-			colone=`echo $lineone | cut -c $x`
-			coltwo=`echo $linetwo | cut -c $x`
-			echo -n -e "$(( $colone + $coltwo ))\t"
+			colone=`echo $lineone | cut -d " " -f $x`
+			coltwo=`echo $linetwo | cut -d " " -f $x`
+			echo -ne "$(( $colone + $coltwo ))"
+			if [[ $x != $cutcols ]]
+			then
+				echo -ne "\t"
+			fi
 		done
-		echo ""
+		echo
 	done
 }
 
@@ -85,12 +89,12 @@ mult () {
 			done
 			echo -n -e "$runningtotal"
 			#Don't want to add a tab at the end
-			if [[ $x != $firstcols ]]
+			if [[ $x != $secondcols ]]
 			then
 				echo -n -e "\t"
 			fi
 		done
-		echo ""
+		echo
 	done
 
 }
@@ -98,26 +102,46 @@ mult () {
 transpose () {
 
 	thedims=`dims $1`
-	cols=`dims $1 | cut -d " " -f 2`
+	rows=`echo $thedims | cut -d " " -f 1`
+	cols=`echo $thedims | cut -d " " -f 2`
 
 	for colvar in `seq 1 $cols`
 	do
-		aftercut=`cut -d'	' -f$colvar $1`
-		echo Aftercut: $aftercut | cat -A
-		afterpaste=`echo $aftercut | paste -s`
-		# echo Afterpaste: $afterpaste
-
-		echo $aftercut
-
-		# echo -n $afterpaste
-
-		# if [[ ! ("$i" -eq $cols) ]]
-		# then
-		#     echo ""
-		# fi
-
+		cutcol=`cut -f$colvar $1`
+		for rowvar in `seq 1 $rows`
+		do
+			echo -n `echo $cutcol | cut -d " " -f $rowvar`
+			if [[ $rowvar != $rows ]]
+			then
+				echo -n -e "\t"
+			fi
+		done
+		echo
 	done
 
+}
+
+mean () {
+	thedims=`dims $1`
+	rows=`echo $thedims | cut -d " " -f 1`
+	cols=`echo $thedims | cut -d " " -f 2`
+	for colvar in `seq 1 $cols`
+	do
+		runningtotal=0
+		for rowvar in `seq 1 $rows`
+		do
+			# echo Colvar: $colvar
+			curval=`head -n $rowvar < $1 | tail -n 1 | cut -f $colvar`
+			# echo Curval: $curval
+			runningtotal=`expr $runningtotal + $curval`
+		done
+		echo -n "$(($runningtotal/$rows))"
+		if [[ $colvar != $cols ]]
+		then
+			echo -ne "\t"
+		fi
+	done
+	echo
 }
 
 if [[ "$1" = "dims" ]]
@@ -165,8 +189,21 @@ then
 	exit 0
 elif [ "$1" = "mean" ]
 then
-	echo "Mean"
-	# mean ${2:-/dev/stdin}
+	# If we don't have two params or don't have one param w/  stdin
+	if [[ !( ("$#" -eq 1 && -n ${-/dev/stdin}) || "$#" -eq 2) ]]
+	then
+		echo "Bad params" >&2
+		exit 1
+	fi
+
+	if [[ ! (-f $2 || ("$#" -eq 1 && -n ${-/dev/stdin})) ]]
+	then
+		echo "File not found" >&2
+		exit 2
+	fi
+
+	mean ${2:-/dev/stdin}
+	exit 0
 elif [ "$1" = "multiply" ]
 then
 	if [[ !("$#" -eq 3) ]]
@@ -182,9 +219,11 @@ then
 	fi
 
 	dims1=`dims $2`
-	dims2=`dims $3 | rev`
+	dims2=`dims $3`
+	dims2rev=`echo $dims2 | rev`
 
-	if [[ "$dims1" != "$dims2" ]]
+
+	if [[ "$dims1" != "$dims2" && "$dims1" != "$dims2rev" ]]
 	then
 		echo "Cannot multiply these matricies" >&2
 		exit 3
