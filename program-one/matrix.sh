@@ -246,11 +246,12 @@ then
 	dims2rev=`echo $dims2 | rev`
 
 
-	if [[ "$dims1" != "$dims2" && "$dims1" != "$dims2rev" ]]
-	then
-		echo "Cannot multiply these matricies" >&2
-		exit 3
-	fi
+	# if [[ "$dims1" != "$dims2" && "$dims1" != "$dims2rev" ]]
+	# then
+	# 	echo "Cannot multiply these matricies" >&2
+	# 	exit 3
+	# fi
+
 	# echo "Mult"
 	mult $2 $3
 	exit 0
@@ -267,6 +268,12 @@ then
 	then
 		echo "File not found" >&2
 		exit 2
+	fi
+
+	if [[ ! (-r $2) ]]
+	then
+		echo "File cannot be read" >&2
+		exit 3
 	fi
 
 	transpose $2
