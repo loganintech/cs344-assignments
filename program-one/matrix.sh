@@ -72,45 +72,68 @@ add () {
 }
 
 mult () {
-	firstdims=`dims $1`
+	temp1=$1
+	first=$2
+	second=$temp1
+
+	#echo First: $first, Second: $second
+	#echo One: $1, Two: $2
+	firstdims=`dims $first`
 	firstrows=`echo $firstdims | cut -d " " -f 1`
 	firstcols=`echo $firstdims | cut -d " " -f 2`
 	# echo First dims: $firstdims, First Rows: $firstrows, First Cols: $firstcols
 
-	seconddims=`dims $2`
+	seconddims=`dims $second`
 	secondrows=`echo $seconddims | cut -d " " -f 1`
 	secondcols=`echo $seconddims | cut -d " " -f 2`
 	# echo Second dims: $seconddims, Second Rows: $secondrows, Second Cols: $secondcols
-	transpose $2 > secondtransposed
+	transpose $second > secondtransposed
 
-	# if [[ $firstdims != $seconddims ]]
-	# then
-	# 	transpose $2 > secondtransposed
-	# fi
-
-	for ((i=1;i<=$firstrows;i++))
+	for firstcol in `seq 1 $firstcols` 
 	do
-		lineone=`head -n $i < $1 | tail -n 1`
-		linetwo=`cat secondtransposed | head -n $i | tail -n 1`
+		# lineone=`head -n $i < $1 | tail -n 1`
+		# linetwo=`cat secondtransposed | head -n $i | tail -n 1`
 		# echo "Lineone: $lineone"
 		# echo "Linetwo: $linetwo"
-		for ((x=1;x<=$secondcols;x++))
-		do
 
+		firstlinenums=`cat $first | cut -f $firstcol`
+		#echo FirstLine: $firstlinenums
 
-			colone=`echo $lineone | cut -d " " -f $x`
-			coltwo=`echo $linetwo | cut -d " " -f $x`
-			echo -ne "$(( $colone * $coltwo ))"
-			if [[ $x != $cutcols ]]
+		for secondcol in `seq 1 $secondrows`
+		do	
+
+			secondlinenums=`cat secondtransposed | cut -f $secondcol`
+			#echo Second Line: $secondlinenums
+			runningtotal=0
+			for arow in `seq 1 $firstrows`
+			do
+
+				firstnum=`echo $firstlinenums | cut -d " " -f $arow`
+				secondnum=`echo $secondlinenums | cut -d " " -f $arow`	
+				curval=$(( $firstnum * $secondnum ))
+				runningtotal=$(( $runningtotal + $curval ))
+			done
+			echo -ne $runningtotal >> resultfile
+			if [[ $secondcol != $secondrows ]]
 			then
-				echo -ne "\t"
+				echo -ne "\t" >> resultfile
 			fi
+
+			# colone=`echo $lineone | cut -d " " -f $x`
+			# coltwo=`echo $linetwo | cut -d " " -f $x`
+			# echo -ne "$(( $colone * $coltwo ))"
+			# if [[ $x != $cutcols ]]
+			# then
+			#	echo -ne "\t"
+			# fi
 		done
-		echo
+		echo >> resultfile
 	done
 
+	transpose resultfile
+	#cat resultfile
 	rm secondtransposed
-
+	rm resultfile
 }
 
 
