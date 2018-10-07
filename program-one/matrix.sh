@@ -89,7 +89,7 @@ mult () {
 	# echo Second dims: $seconddims, Second Rows: $secondrows, Second Cols: $secondcols
 	transpose $second > secondtransposed
 
-	for firstcol in `seq 1 $firstcols` 
+	for firstcol in `seq 1 $firstcols`
 	do
 		# lineone=`head -n $i < $1 | tail -n 1`
 		# linetwo=`cat secondtransposed | head -n $i | tail -n 1`
@@ -100,7 +100,7 @@ mult () {
 		#echo FirstLine: $firstlinenums
 
 		for secondcol in `seq 1 $secondrows`
-		do	
+		do
 
 			secondlinenums=`cat secondtransposed | cut -f $secondcol`
 			#echo Second Line: $secondlinenums
@@ -109,7 +109,7 @@ mult () {
 			do
 
 				firstnum=`echo $firstlinenums | cut -d " " -f $arow`
-				secondnum=`echo $secondlinenums | cut -d " " -f $arow`	
+				secondnum=`echo $secondlinenums | cut -d " " -f $arow`
 				curval=$(( $firstnum * $secondnum ))
 				runningtotal=$(( $runningtotal + $curval ))
 			done
@@ -267,12 +267,6 @@ then
 	then
 		echo "File not found" >&2
 		exit 2
-	fi
-
-	if [[ ! (-r $2) ]]
-	then
-		echo "File cannot be read" >&2
-		exit 3
 	fi
 
 	transpose $2
