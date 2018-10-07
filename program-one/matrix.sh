@@ -283,3 +283,4 @@ else
 	exit 1
 fi
 
+trap "rm secondtransposed && rm resultfile" SIGINT SIGTERM
