@@ -282,5 +282,3 @@ else
 	echo "That is not a valid command." >&2
 	exit 1
 fi
-
-trap "rm secondtransposed && rm resultfile" SIGINT SIGTERM
