@@ -146,8 +146,6 @@ fn main() -> std::result::Result<(), Box<std::error::Error>> {
             exit(1);
         }
     }
-
-    Ok(())
 }
 
 fn dims(matrix: &Matrix) -> Matrix {
