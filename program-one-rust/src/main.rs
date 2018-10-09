@@ -104,7 +104,6 @@ fn main() -> std::result::Result<(), Box<std::error::Error>> {
                 second_filename.expect("You must include a second matrix for this function."),
             )?)?;
 
-
             if dims(&matrix)[0] != dims(&second_matrix)[1] {
                 eprintln!("Cannot add matricies of different sizes.");
                 exit(1);
@@ -190,20 +189,25 @@ fn mean(matrix: &Matrix) -> Matrix {
     means
 }
 
-
 //This is an idomatic rust implementation of the mean function above. It uses iterators instead of for loops with indexes
 //Unlike the function above, this one cannot have an index out of bounds error nor can it have a divide-by-zero error.
 fn mean_iterator(matrix: &Matrix) -> Matrix {
+    //For every column in our matrix
     matrix
+        //Iterate over each column
         .iter()
+        //I did explicit type annotations here so we know it's a reference and can call methods like .sum
         .map(|item: &Vec<i32>| {
-
+            //If the column has no values just return an empty vector
             if !item.len() > 0 {
                 return vec![];
             }
 
+            //Otherwise, return a single-length vector with the sum divded by the length, rounded
             vec![(item.iter().sum::<i32>() as f32 / item.len() as f32).round() as i32]
-        }).collect()
+        })
+        //Then collect all of the columns into our matrix
+        .collect()
 }
 
 //This function also consumes its calling matricies by value. This could also be by reference, but after multiplying it'll drop and that preserves memory (although not much)
@@ -230,28 +234,36 @@ fn multiply(matrix: Matrix, second_matrix: Matrix) -> Matrix {
     result
 }
 
-
 //This is an idomatic rust implementation of the multiply function above. It uses iterators instead of for loops with indexes
 //Unlike the function above, this one cannot have an index out of bounds error and therefore cannot panic and crash the program
 fn multiply_iterator(matrix: Matrix, second_matrix: Matrix) -> Matrix {
     let transposed = transpose(matrix);
 
     second_matrix
+        //Iterate over our second matrix
         .iter()
+        //For each column in the first matrix
         .map(|column| {
-
             transposed
+                //Iterate over all the columns in the second
                 .iter()
                 .map(|second_column| {
-
+                    //For each of the first columns
                     column
+                        //Iterate over the values in it
                         .iter()
+                        //Zip the values from the second column
                         .zip(second_column)
-                        .fold(0, |accum, (first_elem, second_elem)| accum + (first_elem * second_elem))
-
-                }).collect()
-
-        }).collect()
+                        //Starting from zero, set the accumulator value to the value of the accumulator + the (first * second) element
+                        .fold(0, |accum, (first_elem, second_elem)| {
+                            accum + (first_elem * second_elem)
+                        }) //We don't need to `collect` this one because we're getting a single value from our iterator and returning that to the map
+                })
+                //Now we collect all the values for that column
+                .collect()
+        })
+        //And we collect all the columns together into one matrix
+        .collect()
 }
 
 #[allow(dead_code)]
@@ -274,15 +286,24 @@ fn add(matrix: Matrix, second_matrix: Matrix) -> Matrix {
 //Unlike the function above, this one cannot have an index out of bounds error and therefore cannot panic and crash the program
 fn add_iterator(matrix: Matrix, second_matrix: Matrix) -> Matrix {
     matrix
+        //Convert matrix to an iter
         .iter()
+        //Zip the second matrix's iter into it, so they iterate together
         .zip(second_matrix.iter())
+        //The zip creates a tuple with left being the first matrix and right being the second
         .map(|(left_col, right_col)| {
             left_col
+                //Iterate over the first column from `matrix`
                 .iter()
+                //Zip the right column into the left so we're iterating over values together
                 .zip(right_col.iter())
+                //For each row, put the left and right values together
                 .map(|(left_val, right_val)| left_val + right_val)
+                //Collect them into a vector of our added values
                 .collect()
-        }).collect()
+        })
+        //Collect all of our columns into one vector of matricies
+        .collect()
 }
 
 //This function takes a generic parameter
