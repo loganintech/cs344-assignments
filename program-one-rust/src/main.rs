@@ -224,11 +224,11 @@ fn add(matrix: Matrix, second_matrix: Matrix) -> Matrix {
     result
 }
 
-fn add_iterator(matrix: Matrix, second_matrix: Matrix) -> Matrix {
+// fn add_iterator(matrix: Matrix, second_matrix: Matrix) -> Matrix {
 
 
 
-}
+// }
 
 //This function takes a generic parameter
 //You can read it like this
