@@ -6,6 +6,8 @@ use std::process::exit;
 // Type alias for matrix. Matrix is a 2-d array of 32-bit signed ints
 type Matrix = Vec<Vec<i32>>;
 
+//Loop over our matrix and print it from top to bottom, left to right
+//Take it by reference because we don't want to steal ownership from the caller when printing
 fn print_matrix(matrix: &Matrix) {
     for y_axis in 0..matrix[0].len() {
         for x_axis in 0..matrix.len() {
@@ -86,7 +88,7 @@ fn main() -> std::result::Result<(), Box<std::error::Error>> {
                 parse_matrix(File::open(first_filename.unwrap())?)?
             };
 
-            print_matrix(&mean(&matrix));
+            print_matrix(&mean_iterator(&matrix));
         }
         "multiply" => {
             // Try to load a first filename, failing if the filename is None or matix cannot be parsed
@@ -174,6 +176,14 @@ fn mean(matrix: &Matrix) -> Matrix {
     means
 }
 
+fn mean_iterator(matrix: &Matrix) -> Matrix {
+
+    matrix.iter().map(|item: &Vec<i32>| {
+        vec![(item.iter().sum::<i32>() as f32 / item.len() as f32).round() as i32; 1]
+    }).collect()
+
+}
+
 //This function also consumes its calling matricies by value. This could also be by reference, but after multiplying it'll drop and that preserves memory (although not much)
 fn multiply(matrix: Matrix, second_matrix: Matrix) -> Matrix {
     let mut result = Matrix::new();
@@ -212,6 +222,12 @@ fn add(matrix: Matrix, second_matrix: Matrix) -> Matrix {
     }
 
     result
+}
+
+fn add_iterator(matrix: Matrix, second_matrix: Matrix) -> Matrix {
+
+
+
 }
 
 //This function takes a generic parameter
