@@ -199,7 +199,7 @@ fn mean_iterator(matrix: &Matrix) -> Matrix {
         //I did explicit type annotations here so we know it's a reference and can call methods like .sum
         .map(|item: &Vec<i32>| {
             //If the column has no values just return an empty vector
-            if !item.len() > 0 {
+            if !(item.len() > 0) {
                 return vec![];
             }
 
