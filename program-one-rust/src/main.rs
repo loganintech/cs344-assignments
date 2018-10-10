@@ -80,7 +80,7 @@ fn main() -> std::result::Result<(), Box<std::error::Error>> {
                 exit(1);
             }
 
-            print_matrix(&add_iterator(matrix, second_matrix));
+            print_matrix(&add_iterator(&matrix, &second_matrix));
         }
         "mean" => {
             //If we have no first filename, load from stdin. If that fails, the program fails.
@@ -109,7 +109,7 @@ fn main() -> std::result::Result<(), Box<std::error::Error>> {
                 exit(1);
             }
 
-            print_matrix(&multiply_iterator(matrix, second_matrix));
+            print_matrix(&multiply_iterator(&matrix, &second_matrix));
         }
         "transpose" => {
             //If we have no first filename, load from stdin. If that fails, the program fails.
@@ -120,7 +120,7 @@ fn main() -> std::result::Result<(), Box<std::error::Error>> {
                 parse_matrix(File::open(first_filename.unwrap())?)?
             };
 
-            let transposed = transpose(matrix);
+            let transposed = transpose(&matrix);
             print_matrix(&transposed);
         }
         //The case where none of the strings match
@@ -140,11 +140,11 @@ fn dims(matrix: &Matrix) -> Matrix {
     vec![vec![matrix.len() as i32], vec![matrix[0].len() as i32]]
 }
 
-//This takes the matrix by value, dropping the matrix at the end of the function
-//After this function, the matrix passed into it by the calling code is unusable
-//This is because of the way rust's borrow checker works. Read more here: https://doc.rust-lang.org/book/second-edition/ch04-00-understanding-ownership.html
-//This could easily take matricies by reference if we wanted, preserving the original _and_ the transposed version
-fn transpose(matrix: Matrix) -> Matrix {
+
+//This function takes a matrix by reference and returns a new matrix
+//It can do this because i32 implements the `Copy` trait, meaning a shallow-copy of its stack memory is enough
+//To create a UNIQUE copy of the data.
+fn transpose(matrix: &Matrix) -> Matrix {
     //We create a new, mutable matrix
     let mut transposed = Matrix::new();
     //Resize this matrix to be the exact capacity we need, filling in the values with correctly-sized columnns filled with 0
@@ -212,7 +212,7 @@ fn mean_iterator(matrix: &Matrix) -> Matrix {
 
 //This function also consumes its calling matricies by value. This could also be by reference, but after multiplying it'll drop and that preserves memory (although not much)
 #[allow(dead_code)]
-fn multiply(matrix: Matrix, second_matrix: Matrix) -> Matrix {
+fn multiply(matrix: &Matrix, second_matrix: &Matrix) -> Matrix {
     let mut result = Matrix::new();
     //Set the values of this vector to 1 because multiplying by 0 is always 0
     result.resize(second_matrix.len(), vec![1; matrix[0].len()]);
@@ -236,7 +236,7 @@ fn multiply(matrix: Matrix, second_matrix: Matrix) -> Matrix {
 
 //This is an idomatic rust implementation of the multiply function above. It uses iterators instead of for loops with indexes
 //Unlike the function above, this one cannot have an index out of bounds error and therefore cannot panic and crash the program
-fn multiply_iterator(matrix: Matrix, second_matrix: Matrix) -> Matrix {
+fn multiply_iterator(matrix: &Matrix, second_matrix: &Matrix) -> Matrix {
     let transposed = transpose(matrix);
 
     second_matrix
@@ -267,7 +267,7 @@ fn multiply_iterator(matrix: Matrix, second_matrix: Matrix) -> Matrix {
 }
 
 #[allow(dead_code)]
-fn add(matrix: Matrix, second_matrix: Matrix) -> Matrix {
+fn add(matrix: &Matrix, second_matrix: &Matrix) -> Matrix {
     let mut result = Matrix::new();
     //Our matrix should be the same size as the source matrix, so we resize to that
     result.resize(matrix.len(), vec![0; matrix[0].len()]);
@@ -284,7 +284,7 @@ fn add(matrix: Matrix, second_matrix: Matrix) -> Matrix {
 
 //This is an idomatic rust implementation of the add function above. It uses iterators instead of for loops with indexes
 //Unlike the function above, this one cannot have an index out of bounds error and therefore cannot panic and crash the program
-fn add_iterator(matrix: Matrix, second_matrix: Matrix) -> Matrix {
+fn add_iterator(matrix: &Matrix, second_matrix: &Matrix) -> Matrix {
     matrix
         //Convert matrix to an iter
         .iter()
