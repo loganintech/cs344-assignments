@@ -45,7 +45,7 @@ fn main() -> std::result::Result<(), Box<std::error::Error>> {
             // some_val is the value of 3
 
             //If we have no first filename, load from stdin. If that fails, the program fails.
-             let matrix = if first_filename.is_none() {
+            let matrix = if first_filename.is_none() {
                 parse_matrix(io::stdin())?
             } else {
                 //Opens a file and unwraps the filename. This is safe because we already checked above that first_filename is not None
@@ -65,23 +65,26 @@ fn main() -> std::result::Result<(), Box<std::error::Error>> {
             println!("{} {}", dims[1][0], dims[0][0]);
         }
         "add" => {
-
             // Try to load a first filename, failing if the filename is None or matix cannot be parsed
-            let matrix = parse_matrix(File::open(first_filename.expect("You must include a first matrix for this function."))?)?;
+            let matrix = parse_matrix(File::open(
+                first_filename.expect("You must include a first matrix for this function."),
+            )?)?;
 
             //Try to load a second filename
-            let second_matrix = parse_matrix(File::open(second_filename.expect("You must include a second matrix for this function."))?)?;
+            let second_matrix = parse_matrix(File::open(
+                second_filename.expect("You must include a second matrix for this function."),
+            )?)?;
 
             if dims(&matrix) != dims(&second_matrix) {
                 eprintln!("Cannot add matricies of different sizes.");
                 exit(1);
             }
 
-            print_matrix(&add(matrix, second_matrix));
+            print_matrix(&add_iterator(matrix, second_matrix));
         }
         "mean" => {
             //If we have no first filename, load from stdin. If that fails, the program fails.
-             let matrix = if first_filename.is_none() {
+            let matrix = if first_filename.is_none() {
                 parse_matrix(io::stdin())?
             } else {
                 //Opens a file and unwraps the filename. This is safe because we already checked above that first_filename is not None
@@ -92,16 +95,25 @@ fn main() -> std::result::Result<(), Box<std::error::Error>> {
         }
         "multiply" => {
             // Try to load a first filename, failing if the filename is None or matix cannot be parsed
-            let matrix = parse_matrix(File::open(first_filename.expect("You must include a first matrix for this function."))?)?;
+            let matrix = parse_matrix(File::open(
+                first_filename.expect("You must include a first matrix for this function."),
+            )?)?;
 
             //Try to load a second filename
-            let second_matrix = parse_matrix(File::open(second_filename.expect("You must include a second matrix for this function."))?)?;
+            let second_matrix = parse_matrix(File::open(
+                second_filename.expect("You must include a second matrix for this function."),
+            )?)?;
 
-            print_matrix(&multiply(matrix, second_matrix));
+            if dims(&matrix)[0] != dims(&second_matrix)[1] {
+                eprintln!("Cannot add matricies of different sizes.");
+                exit(1);
+            }
+
+            print_matrix(&multiply_iterator(matrix, second_matrix));
         }
         "transpose" => {
             //If we have no first filename, load from stdin. If that fails, the program fails.
-             let matrix = if first_filename.is_none() {
+            let matrix = if first_filename.is_none() {
                 parse_matrix(io::stdin())?
             } else {
                 //Opens a file and unwraps the filename. This is safe because we already checked above that first_filename is not None
@@ -154,6 +166,7 @@ fn transpose(matrix: Matrix) -> Matrix {
 }
 
 //Takes the matrix by reference so that we can keep the matrix and its means in the caller
+#[allow(dead_code)]
 fn mean(matrix: &Matrix) -> Matrix {
     //Create a new, mutable matrix
     let mut means: Matrix = Matrix::new();
@@ -176,15 +189,29 @@ fn mean(matrix: &Matrix) -> Matrix {
     means
 }
 
+//This is an idomatic rust implementation of the mean function above. It uses iterators instead of for loops with indexes
+//Unlike the function above, this one cannot have an index out of bounds error nor can it have a divide-by-zero error.
 fn mean_iterator(matrix: &Matrix) -> Matrix {
+    //For every column in our matrix
+    matrix
+        //Iterate over each column
+        .iter()
+        //I did explicit type annotations here so we know it's a reference and can call methods like .sum
+        .map(|item: &Vec<i32>| {
+            //If the column has no values just return an empty vector
+            if !(item.len() > 0) {
+                return vec![];
+            }
 
-    matrix.iter().map(|item: &Vec<i32>| {
-        vec![(item.iter().sum::<i32>() as f32 / item.len() as f32).round() as i32; 1]
-    }).collect()
-
+            //Otherwise, return a single-length vector with the sum divded by the length, rounded
+            vec![(item.iter().sum::<i32>() as f32 / item.len() as f32).round() as i32]
+        })
+        //Then collect all of the columns into our matrix
+        .collect()
 }
 
 //This function also consumes its calling matricies by value. This could also be by reference, but after multiplying it'll drop and that preserves memory (although not much)
+#[allow(dead_code)]
 fn multiply(matrix: Matrix, second_matrix: Matrix) -> Matrix {
     let mut result = Matrix::new();
     //Set the values of this vector to 1 because multiplying by 0 is always 0
@@ -207,6 +234,39 @@ fn multiply(matrix: Matrix, second_matrix: Matrix) -> Matrix {
     result
 }
 
+//This is an idomatic rust implementation of the multiply function above. It uses iterators instead of for loops with indexes
+//Unlike the function above, this one cannot have an index out of bounds error and therefore cannot panic and crash the program
+fn multiply_iterator(matrix: Matrix, second_matrix: Matrix) -> Matrix {
+    let transposed = transpose(matrix);
+
+    second_matrix
+        //Iterate over our second matrix
+        .iter()
+        //For each column in the first matrix
+        .map(|column| {
+            transposed
+                //Iterate over all the columns in the second
+                .iter()
+                .map(|second_column| {
+                    //For each of the first columns
+                    column
+                        //Iterate over the values in it
+                        .iter()
+                        //Zip the values from the second column
+                        .zip(second_column)
+                        //Starting from zero, set the accumulator value to the value of the accumulator + the (first * second) element
+                        .fold(0, |accum, (first_elem, second_elem)| {
+                            accum + (first_elem * second_elem)
+                        }) //We don't need to `collect` this one because we're getting a single value from our iterator and returning that to the map
+                })
+                //Now we collect all the values for that column
+                .collect()
+        })
+        //And we collect all the columns together into one matrix
+        .collect()
+}
+
+#[allow(dead_code)]
 fn add(matrix: Matrix, second_matrix: Matrix) -> Matrix {
     let mut result = Matrix::new();
     //Our matrix should be the same size as the source matrix, so we resize to that
@@ -215,27 +275,41 @@ fn add(matrix: Matrix, second_matrix: Matrix) -> Matrix {
     //Loop from 0..matrix.len() and add the values in each position to our result matrix
     for x_axis in 0..matrix.len() {
         for y_axis in 0..matrix[0].len() {
-
             result[x_axis][y_axis] = matrix[x_axis][y_axis] + second_matrix[x_axis][y_axis];
-
         }
     }
 
     result
 }
 
-// fn add_iterator(matrix: Matrix, second_matrix: Matrix) -> Matrix {
-
-
-
-// }
+//This is an idomatic rust implementation of the add function above. It uses iterators instead of for loops with indexes
+//Unlike the function above, this one cannot have an index out of bounds error and therefore cannot panic and crash the program
+fn add_iterator(matrix: Matrix, second_matrix: Matrix) -> Matrix {
+    matrix
+        //Convert matrix to an iter
+        .iter()
+        //Zip the second matrix's iter into it, so they iterate together
+        .zip(second_matrix.iter())
+        //The zip creates a tuple with left being the first matrix and right being the second
+        .map(|(left_col, right_col)| {
+            left_col
+                //Iterate over the first column from `matrix`
+                .iter()
+                //Zip the right column into the left so we're iterating over values together
+                .zip(right_col.iter())
+                //For each row, put the left and right values together
+                .map(|(left_val, right_val)| left_val + right_val)
+                //Collect them into a vector of our added values
+                .collect()
+        })
+        //Collect all of our columns into one vector of matricies
+        .collect()
+}
 
 //This function takes a generic parameter
 //You can read it like this
 //
 // For all types `T` where `T` implements the Trait `Read`, parse_matrix for that T, taking T by value
-//
-//
 fn parse_matrix<T: Read>(source: T) -> io::Result<Matrix> {
     //Create a buffered reader of type `T` from our source.
     //This doesn't help all that much for stdin, but should decrease the time we spend waiting for the operating system to return lines from a file
