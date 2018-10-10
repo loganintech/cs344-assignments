@@ -2,3 +2,5 @@ program-one-rust/target
 program-one-rust/*.txt
 program-one-rust/matrix.sh
 
+program-py-rust/target
+program-py-rust/*.txt
