@@ -1,0 +1,69 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [{
+            "label": "Make Rooms",
+            "type": "shell",
+            "command": "make rooms",
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false
+            }
+        },
+        {
+            "label": "Make Adventure",
+            "type": "shell",
+            "command": "make adventure",
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false
+            }
+        },
+        {
+            "label": "Valgrind Rooms",
+            "type": "shell",
+            "command": "valgrind ${workspaceRoot}/out/rooms",
+            "group": "test",
+            "problemMatcher": [],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false
+            },
+            "options": {
+                "cwd": "${workspaceRoot}/rooms"
+            }
+        },
+        {
+            "label": "Valgrind Adventure",
+            "type": "shell",
+            "command": "valgrind ${workspaceRoot}/out/adventure",
+            "group": "test",
+            "problemMatcher": [],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false
+            }
+        }
+    ]
+}
