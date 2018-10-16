@@ -1,6 +1,6 @@
 
-rooms:
-	gcc -o out/rooms src/sasol.rooms.c
+room:
+	gcc --std=c89 -ggdb -o rooms.out src/sasol.rooms.c
 
 adventure:
-	gcc -o out/adventure src/sasol.adventure.c
+	gcc --std=c89 -o adventure src/sasol.adventure.c

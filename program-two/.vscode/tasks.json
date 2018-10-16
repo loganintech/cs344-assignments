@@ -5,7 +5,7 @@
     "tasks": [{
             "label": "Make Rooms",
             "type": "shell",
-            "command": "make rooms",
+            "command": "make room",
             "group": "build",
             "problemMatcher": [
                 "$gcc"
@@ -37,7 +37,7 @@
         {
             "label": "Valgrind Rooms",
             "type": "shell",
-            "command": "valgrind ${workspaceRoot}/out/rooms",
+            "command": "valgrind ${workspaceRoot}/rooms.a",
             "group": "test",
             "problemMatcher": [],
             "presentation": {
@@ -54,7 +54,7 @@
         {
             "label": "Valgrind Adventure",
             "type": "shell",
-            "command": "valgrind ${workspaceRoot}/out/adventure",
+            "command": "valgrind ${workspaceRoot}/adventure",
             "group": "test",
             "problemMatcher": [],
             "presentation": {
