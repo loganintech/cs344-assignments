@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
@@ -106,7 +107,7 @@ char *concat_string(char *one, char *two)
 char *write_to_file(char *room_string, char *room_name)
 {
 
-    /*     int pid = getpid();
+    /*
     char snum[10];
      char *connection_string = sprintf(snum, "%d", pid); */
 
@@ -123,7 +124,7 @@ char *write_to_file(char *room_string, char *room_name)
     free(filename);
 }
 
-void write_room_to_file(struct Room room)
+void write_room_to_file(struct Room room, char* folder_name)
 {
 
     /*  Example setting for testing this function */
@@ -166,8 +167,13 @@ void write_room_to_file(struct Room room)
 
     /*  printf("%s\n", file_format); */
 
-    write_to_file(file_format, names[room.name_index]);
+    char *folder_name_copy = malloc(sizeof(char) * 50);
+    strcpy(folder_name_copy, folder_name);
+    folder_name_copy = concat_string(folder_name_copy, "/");
+    folder_name_copy = concat_string(folder_name_copy, names[room.name_index]);
 
+    write_to_file(file_format, folder_name_copy);
+    free(folder_name_copy);
     free(file_format);
 }
 
@@ -266,21 +272,39 @@ int connection_exists(struct Room *room_one, struct Room *room_two)
     return false;
 }
 
+void make_folder(char* location) {
+    struct stat st = {0};
+
+    if (stat(location, &st) == -1)
+    {
+        mkdir(location, 0700);
+    }
+}
+
 int main()
 {
     srand(time(NULL));
+
+    int pid = getpid();
     /* printf("Pid found: %d\n", pid); */
 
     struct Room **rooms = generate_7_rooms();
 
     generate_graph(rooms, 7);
 
-    /*  printf("Finished Generation\n"); */
+    char *folder_name = malloc(sizeof(char) * 20);
+    folder_name = concat_string(folder_name, "sasol.rooms.");
+
+    char snum[10];
+    sprintf(snum, "%d", pid);
+
+    folder_name = concat_string(folder_name, snum);
+    make_folder(folder_name);
 
     int i, j;
     for (i = 0; i < 7; i++)
     {
-        write_room_to_file(*rooms[i]);
+        write_room_to_file(*rooms[i], folder_name);
     }
 
     for (i = 0; i < 7; i++)
@@ -289,6 +313,7 @@ int main()
         free(rooms[i]);
     }
 
+    free(folder_name);
     free(rooms);
     return 0;
 }
