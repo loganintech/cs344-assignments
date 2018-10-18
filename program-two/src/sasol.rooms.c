@@ -129,6 +129,10 @@ void write_room_to_file(struct Room room, char* folder_name)
 
     /*  Example setting for testing this function */
     char *file_format = malloc(sizeof(char) * 1024);
+    int x;
+    for (x = 0; x < 1024; x++) {
+        file_format[x] = '\0';
+    }
     file_format = concat_string(file_format, "ROOM NAME: ");
     file_format = concat_string(file_format, names[room.name_index]);
 
@@ -292,6 +296,12 @@ int main()
     generate_graph(rooms, 7);
 
     char *folder_name = malloc(sizeof(char) * 20);
+
+    int x;
+    for(x = 0; x < 20; x++) {
+        folder_name[x] = '\0';
+    }
+
     folder_name = concat_string(folder_name, "sasol.rooms.");
 
     char snum[10];
