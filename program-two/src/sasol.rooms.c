@@ -173,7 +173,6 @@ void write_room_to_file(struct Room room, char* folder_name)
     folder_name_copy = concat_string(folder_name_copy, names[room.name_index]);
 
     write_to_file(file_format, folder_name_copy);
-    free(folder_name_copy);
     free(file_format);
 }
 
