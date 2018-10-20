@@ -5,5 +5,7 @@ program-one-rust/matrix.sh
 program-py-rust/target
 program-py-rust/*.txt
 
-program-two-rust/target
-program-two-rust/*.txt
+program-two-rust/**/target
+program-two-rust/**/*.txt
+
+**/*_room
