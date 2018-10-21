@@ -2,6 +2,9 @@ use std::fs::{self, File};
 use std::io;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::path::Path;
+use std::sync::Mutex;
+use std::thread;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(PartialEq)]
 enum RoomType {
@@ -41,6 +44,12 @@ struct Room {
     name: String,
     connections: Vec<String>,
     room_type: RoomType,
+}
+
+impl PartialEq for Room {
+    fn eq(&self, rhs: &Room) -> bool {
+        self.name == rhs.name
+    }
 }
 
 impl std::fmt::Display for Room {
@@ -119,15 +128,36 @@ fn main() -> std::result::Result<(), Box<std::error::Error>> {
     Ok(())
 }
 
+fn write_time() -> io::Result<String> {
+    let start = SystemTime::now();
+    let since_epoch = start.duration_since(UNIX_EPOCH).expect("Weird time issue.");
+
+    let mut time_file = File::create("./currentTime.txt")?;
+    let time_string = format!("{}", since_epoch.as_secs());
+    time_file.write_all(time_string.as_bytes())?;
+
+    Ok(time_string)
+}
+
 fn run_game(rooms: &Vec<Room>) {
     let mut current_room = get_start_room(&rooms).unwrap();
     let mut steps = 0;
     let mut path: Vec<&Room> = Vec::new();
 
     while current_room.room_type != RoomType::EndRoom {
-        current_room = prompt_and_move(&rooms, current_room);
-        steps += 1;
-        path.push(current_room);
+        match prompt_and_move(&rooms, current_room) {
+            Some(x) => {
+                if x != current_room {
+                    current_room = x;
+                    steps += 1;
+                    path.push(current_room);
+                }
+            }
+            None => match thread::spawn(write_time).join().unwrap() {
+                Ok(time) => println!("Time written to file: {}", time),
+                Err(e) => eprintln!("Error occured writing time to file: {}", e),
+            },
+        }
     }
 
     println!("You made it to the end in {} steps!", steps);
@@ -138,7 +168,7 @@ fn run_game(rooms: &Vec<Room>) {
     }
 }
 
-fn prompt_and_move<'a>(rooms: &'a Vec<Room>, current_room: &'a Room) -> &'a Room {
+fn prompt_and_move<'a>(rooms: &'a Vec<Room>, current_room: &'a Room) -> Option<&'a Room> {
     println!("You're in room: {}", current_room.name);
 
     print!("Connections: ");
@@ -161,15 +191,19 @@ fn prompt_and_move<'a>(rooms: &'a Vec<Room>, current_room: &'a Room) -> &'a Room
     buffer.truncate(buffer.len() - 1);
 
     println!("");
+    if buffer == "time" {
+        return None;
+    }
+
     for (index, room) in rooms.iter().enumerate() {
         if buffer == room.name {
-            return &rooms[index];
+            return Some(&rooms[index]);
         }
     }
 
     println!("That is not a connection.");
 
-    current_room
+    Some(current_room)
 }
 
 fn load_files<T: AsRef<Path>>(
