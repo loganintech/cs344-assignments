@@ -2,7 +2,6 @@ use std::fs::{self, File};
 use std::io;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::path::Path;
-use std::sync::Mutex;
 use std::thread;
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -79,27 +78,15 @@ impl Room {
                 let line: String = line.unwrap();
                 match &line {
                     line if line.starts_with("ROOM NAME") => {
-                        let line: String = line
-                            .chars()
-                            .skip_while(|a_char| a_char != &':')
-                            .skip(2)
-                            .collect();
+                        let line: String = extract_value(line);
                         room.name = line;
                     }
                     line if line.starts_with("CONNECTION") => {
-                        let line: String = line
-                            .chars()
-                            .skip_while(|a_char| a_char != &':')
-                            .skip(2)
-                            .collect();
+                        let line: String = extract_value(line);
                         room.connections.push(line);
                     }
                     line if line.starts_with("ROOM TYPE") => {
-                        let line: String = line
-                            .chars()
-                            .skip_while(|a_char| a_char != &':')
-                            .skip(2)
-                            .collect();
+                        let line: String = extract_value(line);
                         room.room_type = line.into();
                     }
                     _ => {}
@@ -108,6 +95,13 @@ impl Room {
 
         Ok(room)
     }
+}
+
+fn extract_value(line: &String) -> String {
+    line.chars()
+        .skip_while(|a_char| a_char != &':')
+        .skip(2)
+        .collect()
 }
 
 fn get_start_room(rooms: &Vec<Room>) -> Option<&Room> {
