@@ -89,7 +89,8 @@ impl Room {
                         let line: String = extract_value(line);
                         room.room_type = line.into();
                     }
-                    _ => {}
+                    line => println!("Erronious line in file: {}", line),
+
                 }
             });
 
@@ -189,9 +190,13 @@ fn prompt_and_move<'a>(rooms: &'a Vec<Room>, current_room: &'a Room) -> Option<&
         return None;
     }
 
-    for (index, room) in rooms.iter().enumerate() {
-        if buffer == room.name {
-            return Some(&rooms[index]);
+    for room_conn in current_room.connections.iter() {
+        if &buffer == room_conn {
+            for (index, room) in rooms.iter().enumerate() {
+                if &room.name == room_conn {
+                    return Some(&rooms[index]);
+                }
+            }
         }
     }
 
