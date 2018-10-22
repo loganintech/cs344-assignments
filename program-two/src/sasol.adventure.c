@@ -387,6 +387,11 @@ int main(char *argv)
 {
 
     char *directory_location = get_directory();
+    if(strlen(directory_location) <= 0) {
+        perror("Cannot find valid directory in current path.\n");
+        free(directory_location);
+        return 3;
+    }
 
     struct Room *rooms = read_files(directory_location);
     free(directory_location);
