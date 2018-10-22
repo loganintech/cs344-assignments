@@ -2,6 +2,8 @@
 name = "adventure"
 version = "0.1.0"
 authors = ["Logan Saso <sasol@oregonstate.edu>"]
-edition = "2018"
+autobins = false
 
-[dependencies]
+[[bin]]
+name = "adventure_game"
+path="src/main.rs"

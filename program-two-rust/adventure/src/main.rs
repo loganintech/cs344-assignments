@@ -183,7 +183,8 @@ fn prompt_and_move<'a>(rooms: &'a Vec<Room>, current_room: &'a Room) -> Option<&
     let mut handle = stdin.lock();
 
     handle.read_line(&mut buffer).unwrap();
-    buffer.truncate(buffer.len() - 1);
+    let buffer_len = buffer.len();
+    buffer.truncate(buffer_len - 1);
 
     println!("");
     if buffer == "time" {
