@@ -220,7 +220,13 @@ fn load_files<T: AsRef<Path>>(
 
 fn get_latest_directory() -> Option<PathBuf> {
     let dir_entries = fs::read_dir("./").unwrap();
-    dir_entries.map(|entry| entry.unwrap().path()).max_by_key(|file_name| {
+    dir_entries
+    .map(|entry| entry.unwrap().path())
+    .filter(|file_name| {
+        let file_split: Vec<&str> = file_name.to_str().unwrap().split(".").collect();
+        file_split.len() == 3 && file_split[0] == "sasol"
+    })
+    .max_by_key(|file_name| {
 
         let meta = fs::metadata(file_name).unwrap();
         meta.modified().unwrap()
