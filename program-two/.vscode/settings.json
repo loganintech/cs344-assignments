@@ -4,6 +4,7 @@
         "*.cmp": "html",
         "*.cls": "java",
         "stdlib.h": "c",
-        "pthread.h": "c"
+        "pthread.h": "c",
+        "types.h": "c"
     }
 }
