@@ -53,9 +53,9 @@ impl PartialEq for Room {
 
 impl std::fmt::Display for Room {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        writeln!(f, "NAME: {}", self.name);
+        writeln!(f, "NAME: {}", self.name)?;
         for conn in &self.connections {
-            writeln!(f, "CONNECTION: {}", conn);
+            writeln!(f, "CONNECTION: {}", conn)?;
         }
         writeln!(f, "ROOM TYPE: {}", self.room_type)
     }
