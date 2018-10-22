@@ -223,8 +223,8 @@ fn get_latest_directory() -> Option<PathBuf> {
     dir_entries
     .map(|entry| entry.unwrap().path())
     .filter(|file_name| {
-        let file_split: Vec<&str> = file_name.to_str().unwrap().split(".").collect();
-        file_split.len() == 3 && file_split[0] == "sasol"
+        let file_split: Vec<&str> = file_name.to_str().unwrap().split(".").skip(1).collect();
+        file_split.len() == 3 && file_split[0] == "/sasol"
     })
     .max_by_key(|file_name| {
 
