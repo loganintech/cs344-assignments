@@ -2,7 +2,8 @@
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
     "version": "2.0.0",
-    "tasks": [{
+    "tasks": [
+        {
             "label": "Make Rooms",
             "type": "shell",
             "command": "make room",
@@ -37,7 +38,7 @@
         {
             "label": "Valgrind Rooms",
             "type": "shell",
-            "command": "valgrind ${workspaceRoot}/rooms.a",
+            "command": "valgrind ${workspaceRoot}/rooms.out",
             "group": "test",
             "problemMatcher": [],
             "presentation": {
@@ -46,16 +47,16 @@
                 "focus": true,
                 "panel": "dedicated",
                 "showReuseMessage": false
-            },
-            "options": {
-                "cwd": "${workspaceRoot}/rooms"
             }
         },
         {
             "label": "Valgrind Adventure",
             "type": "shell",
-            "command": "valgrind ${workspaceRoot}/adventure",
-            "group": "test",
+            "command": "valgrind ${workspaceRoot}/adventure.out",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
             "problemMatcher": [],
             "presentation": {
                 "echo": true,
