@@ -1,7 +1,7 @@
 use std::fs::{self, File};
 use std::io;
 use std::io::{BufRead, BufReader, Read, Write};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::thread;
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -116,7 +116,7 @@ fn get_start_room(rooms: &Vec<Room>) -> Option<&Room> {
 }
 
 fn main() -> std::result::Result<(), Box<std::error::Error>> {
-    let files = load_files(Path::new("./sasol.rooms.10251"))?;
+    let files = load_files(get_latest_directory().unwrap())?;
 
     run_game(&files);
 
@@ -164,8 +164,8 @@ fn run_game(rooms: &Vec<Room>) {
 }
 
 fn prompt_and_move<'a>(rooms: &'a Vec<Room>, current_room: &'a Room) -> Option<&'a Room> {
-    println!("You're in room: {}", current_room.name);
 
+    println!("You're in room: {}", current_room.name);
     print!("Connections: ");
     for connection in 0..current_room.connections.len() - 1 {
         print!("{}, ", current_room.connections[connection]);
@@ -184,7 +184,7 @@ fn prompt_and_move<'a>(rooms: &'a Vec<Room>, current_room: &'a Room) -> Option<&
 
     handle.read_line(&mut buffer).unwrap();
     let buffer_len = buffer.len();
-    buffer.truncate(buffer_len - 1);
+    buffer.truncate(buffer_len - 1); //Get rid of the newline character
 
     println!("");
     if buffer == "time" {
@@ -216,4 +216,14 @@ fn load_files<T: AsRef<Path>>(
     }
 
     Ok(rooms)
+}
+
+fn get_latest_directory() -> Option<PathBuf> {
+    let dir_entries = fs::read_dir("./").unwrap();
+    dir_entries.map(|entry| entry.unwrap().path()).max_by_key(|file_name| {
+
+        let meta = fs::metadata(file_name).unwrap();
+        meta.modified().unwrap()
+
+    })
 }
