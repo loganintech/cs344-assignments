@@ -1,9 +1,0 @@
-[package]
-name = "adventure"
-version = "0.1.0"
-authors = ["Logan Saso <sasol@oregonstate.edu>"]
-autobins = false
-
-[[bin]]
-name = "adventure_game"
-path="src/main.rs"

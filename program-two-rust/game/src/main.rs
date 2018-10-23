@@ -228,8 +228,9 @@ fn prompt_for_game_action<'a>(rooms: &'a Vec<Room>, current_room: &'a Room) -> O
 
     //Read input from the user
     handle.read_line(&mut buffer).unwrap();
-    let buffer_len = buffer.len();
-    buffer.truncate(buffer_len - 1); //Get rid of the newline character
+
+    //Trim buffer to take whitespace off of the right-side of a string
+    let buffer = buffer.trim_right();
 
     //Print a line
     println!("");
@@ -238,20 +239,14 @@ fn prompt_for_game_action<'a>(rooms: &'a Vec<Room>, current_room: &'a Room) -> O
         return None;
     }
 
-    //If we did try to enter a room name, see if it's one of the items in our list
-    for room_conn in current_room.connections.iter() {
-        if &buffer == room_conn {
-            for (index, room) in rooms.iter().enumerate() {
-                if &room.name == room_conn {
-                    //If the room we picked is a connection, return a reference to the new room
-                    return Some(&rooms[index]);
-                }
-            }
-        }
+    //If buffer is a valid connection
+    if current_room.connections.iter().any(|room_conn| room_conn == buffer) {
+        //Loop over all the rooms and filter all the ones with wrong names. Then return the first item of the resulting iterator which should always be the room we
+        return rooms.iter().filter(|room| room.name == buffer).next();
     }
 
     //If it's not in our list print "Ahh cmon guy" and return the same room we're in already
-    println!("That is not a connection.");
+    println!("That is not a connection.\n");
 
     Some(current_room)
 }

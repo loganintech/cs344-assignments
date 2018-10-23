@@ -1,17 +1,14 @@
-both: rooms-bin adventure-bin
+build:
+	cargo build --release
 
-rooms-bin:
-	cd ./rooms && \
-	cargo build --release && \
-	mv target/release/buildrooms ..
+install: build move
 
+move:
+	mv target/release/buildrooms .
+	mv target/release/adventure .
 
-adventure-bin:
-	cd ./adventure && \
-	cargo build --release && \
-	mv target/release/adventure_game ..
 
 clean:
 	rm buildrooms
-	rm adventure_game
+	rm adventure
 	rm -rf sasol.rooms.*

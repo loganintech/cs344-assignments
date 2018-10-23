@@ -16,81 +16,6 @@ During the game, the player can also enter a command that returns the current ti
 For this assignment, do not use the C99 standard: this should be done using raw C (which is C89). In the complete example and grading instructions below, note the absence of the -c99 compilation flag.
 
 # Specifications
-## Rooms Program
-
-The first thing your rooms program must do is create a directory called `<YOUR STUDENT ONID USERNAME>.rooms.<PROCESS ID OF ROOMS PROGRAM>`. Next, it must generate 7 different room files, which will contain one room per file, in the directory just created. You may use any filenames you want for these 7 room files, and these names should be hard-coded into your program. For example, if John Smith was writing the program, he might see this directory and filenames. Note that 19903 was the PID of the rooms program at the time it was executed, and was not hard-coded:
-
-```sh
-$ ls smithj.rooms.19903
-Crowther_room Dungeon_room PLUGH_room PLOVER_room twisty_room XYZZY_room Zork_room
-```
-
-The elements that make up an actual room defined inside a room file are listed below, along with some additional specifications:
-
-- A Room Name
-  - A room name cannot be assigned to more than one room.
-  - Each name can be at max 8 characters long, with only uppercase and lowercase letters allowed (thus, no numbers, special characters, or spaces). This restriction is not extended to the room file's filename.
-  - You must hard code a list of ten different Room Names into your rooms program and have your rooms program randomly assign one of these to each room generated. Thus, for a given run of your rooms program, 7 of the 10 hard-coded room names will be used.
-- A Room Type
-  - The possible room type entries are: START_ROOM, END_ROOM, and MID_ROOM.
-  - The assignment of which room gets which type should be randomly generated each time the rooms program is run.
-  - Naturally, only one room should be assigned the START_ROOM type, and only one room should be assigned the END_ROOM type. The rest of the rooms will receive the MID_ROOM type.
-- Outbound connections to other rooms
-  - There must be at least 3 outbound connections and at most 6 outbound connections from this room to other rooms.
-  - The oubound connections from one room to other rooms should be assigned randomly each time the rooms program is run.
-  - Outbound connections must have matching connections coming back: if room A connects to room B, then room B must have a connection back to room A. Because of all of these specs, there will always be at least one path through.
-  - A room cannot have an outbound connection that points to itself.
-  - A room cannot have more than one outbound connection to the same room.
-
-Each file that stores a room must have exactly this format, where the … is additional outbound room connections, as randomly generated:
-
-```
-ROOM NAME: <room name>
-CONNECTION 1: <room name>
-…
-ROOM TYPE: <room type>
-```
-
-Here are the contents of files representing three sample rooms from a full set of room files (remember, you must use this same format). My list of room names includes the following, among others: XYZZY, PLUGH, PLOVER, twisty, Zork, Crowther, and Dungeon.
-
-```
-ROOM NAME: XYZZY
-CONNECTION 1: PLOVER
-CONNECTION 2: Dungeon
-CONNECTION 3: twisty
-ROOM TYPE: START_ROOM
-
-ROOM NAME: twisty
-CONNECTION 1: PLOVER
-CONNECTION 2: XYZZY
-CONNECTION 3: Dungeon
-CONNECTION 4: PLUGH
-ROOM TYPE: MID_ROOM
-
-... (Other rooms) ...
-
-ROOM NAME: Dungeon
-CONNECTION 1: twisty
-CONNECTION 2: PLOVER
-CONNECTION 3: XYZZY
-CONNECTION 4: PLUGH
-CONNECTION 5: Crowther
-CONNECTION 6: Zork
-ROOM TYPE: END_ROOM
-```
-
-The ordering of the connections from a room to the other rooms, in the file, does not matter. Note that the randomization you do here to define the layout is not all that important: just make sure the connections between rooms, the room names themselves and which room is which type, is somewhat different each time the rooms program is run, however you want to do that. We're not evaluating your randomization procedure, though it's not acceptable to just randomize the room names yet use the same room structure every time.
-
-I highly recommend building up the room graph in this manner: adding outbound connections two at a time (forwards and backwards), to randomly chosen room endpoints, until the map of all the rooms satisfies the requirements listed above. It's easy, requires no backtracking, and tends to generate sparser layouts. As a warning, the alternate method of choosing the number of connections beforehand that each room will have is not recommended, as it's hard to make those chosen numbers match the constraints of the map. To help do this correctly, please read the article 2.2 Program Outlining in Program 2 and consider using the room-generating pseudo-code listed there!
-
-Here is an example of the rooms program being compiled and then run. Note that it returns NO OUTPUT, unless there is an error:
-
-```
-$ gcc -o smithj.buildrooms smithj.buildrooms.c
-$ smithj.buildrooms
-$
-```
-
 ## The Game
 
 Now let’s describe what should be presented to the player in the game. Once the rooms program has been run, which generates the room files, the game program can then be run. This program should present an interface to the player. Note that the room data must be read back into the program from the previously-generated room files, for use by the game. Since the rooms program may have been run multiple times before executing the game, your game should use the most recently created files: perform a stat() function call (Links to an external site.)Links to an external site. on rooms directories in the same directory as the game, and open the one with most recent st_mtime component of the returned stat struct.
@@ -209,17 +134,6 @@ CONNECTION 1: PLOVER
 CONNECTION 2: Dungeon
 CONNECTION 3: twisty
 ROOM TYPE: START_ROOM
-```
-
-# Hints
-- You’ll need to figure out how to get C to read input from the keyboard, and pause until input is received. I recommend you use the getline() function as described in the lectures. You’ll also get the chance to become proficient reading and writing files. You may use either the older open(), close(), lseek() method of manipulating files, or the STDIO standard input library methods that use fopen(), fclose(), and fseek().
-- Remember that you cannot copy a string with the assignment operator (=) in C! You'll need to copy strings around using a member of the strcpy() family. Don't confuse string pointers with the character data itself.
-- For the timekeeping requirement, consider the following. Perhaps the main thread at its beginning locks a mutex, then spawns a second thread whose first action is to attempt to gain control of the mutex by calling ...lock(), which blocks itself. How is the second thread started up again, when the user types "time"? By the first thread calling ...unlock(). You can keep the first thread blocked while the second thread runs by calling ...join() in the first thread. Remember to relock the mutex in the main thread when it starts running again and then re-create the second thread.
-- I HIGHY recommend that you develop this program directly on our class server (see our home page). Doing so will prevent you from having problems transferring the program back and forth, which can cause compatibility issues.
-
-If you do see ^M characters all over your files, try this command:
-```
-$ dos2unix bustedFile
 ```
 
 # What to Turn In and When

@@ -1,0 +1,24 @@
+cargo-features = ["default-run"]
+
+[package]
+name = "program-two"
+version = "0.1.0"
+authors = ["Logan Saso <logansaso@gmail.com>"]
+default-run = "adventure"
+
+[dependencies]
+rand = "0.5"
+
+[workspace]
+members = [
+    "game",
+    "rooms"
+]
+
+[[bin]]
+name = "adventure"
+path = "game/src/main.rs"
+
+[[bin]]
+name = "buildrooms"
+path = "rooms/src/main.rs"
