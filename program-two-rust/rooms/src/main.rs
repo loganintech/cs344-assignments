@@ -4,9 +4,9 @@ use rand::prelude::*;
 
 use std::ffi::OsStr;
 use std::fmt;
+use std::fs::{create_dir, write};
 use std::path::Path;
 use std::process::id;
-use std::fs::{create_dir, write};
 
 //The derive line has the rust compiler implement `Clone` and `Copy` for us
 //Clone says this copy can be duplicated. For something to be `Clone`, all of its fields must be `Clone`

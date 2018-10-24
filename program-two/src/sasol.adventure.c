@@ -303,7 +303,7 @@ void *write_time()
         memset(time_string, '\0', 200);
         char newline[1] = {'\n'};
 
-        size_t length = strftime(time_string, 200, "%I:%M%p, %A, %m %e, %Y", right_now);
+        size_t length = strftime(time_string, 200, "%I:%M%p, %A, %B %e, %Y", right_now);
 
         fwrite(time_string, sizeof(char), length, time_file);
         fwrite(&newline, sizeof(char), 1, time_file);

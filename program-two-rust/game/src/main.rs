@@ -1,3 +1,7 @@
+extern crate chrono;
+
+use chrono::prelude::*;
+
 use std::fs::{self, File};
 use std::io;
 use std::io::{BufRead, BufReader, Read, Write};
@@ -142,7 +146,11 @@ fn get_start_room(rooms: &Vec<Room>) -> Option<&Room> {
 }
 
 fn main() -> Result<(), Box<std::error::Error>> {
-    let files = load_files(get_latest_directory().unwrap())?;
+    let latest_dir = match get_latest_directory() {
+        Some(dir) => dir,
+        None => { eprintln!("Couldn't find a rooms directory."); panic!(1); },
+    };
+    let files = load_files(latest_dir)?;
 
     run_game(&files);
 
@@ -151,11 +159,9 @@ fn main() -> Result<(), Box<std::error::Error>> {
 
 //Gets the current time, gets epoch, creates the file (deleting old ones) and writes the epoch to the file
 fn write_time() -> io::Result<String> {
-    let start = SystemTime::now();
-    let since_epoch = start.duration_since(UNIX_EPOCH).expect("Weird time issue.");
-
+    let current_time = Local::now();
     let mut time_file = File::create("./currentTime.txt")?;
-    let time_string = format!("{}", since_epoch.as_secs());
+    let time_string = current_time.format("%I:%M%p, %A, %B %e, %Y").to_string();
     time_file.write_all(time_string.as_bytes())?;
 
     Ok(time_string)
@@ -164,7 +170,8 @@ fn write_time() -> io::Result<String> {
 //Takes a vector of rooms to use
 fn run_game(rooms: &Vec<Room>) {
     //Get a reference to our start room;
-    let mut current_room = get_start_room(&rooms).unwrap();
+    let mut current_room = get_start_room(&rooms).expect("Couldn't find a starting room.");
+
     //Setup an int for our steps
     let mut steps = 0;
     //Setup a list of room references. This is dropped before `rooms`, which means we can do this. If we were to move rooms into a function or variable in this function we'd get errors
@@ -186,7 +193,7 @@ fn run_game(rooms: &Vec<Room>) {
             //If the second thread fails it would fail. We could use a nested match here to ensure we handle every possibility
             //In rust, the function `.unwrap` is a conscious decision to say "If there was an error here, the program should crash"
             //In this case it's me being a bit lazy
-            None => match thread::spawn(write_time).join().unwrap() {
+            None => match thread::spawn(write_time).join().expect("The time thread crashed when writing to the file.") {
                 Ok(time) => println!("Time written to file: {}", time),
                 Err(e) => eprintln!("Error occured writing time to file: {}", e),
             },
@@ -266,7 +273,10 @@ fn load_files<T: AsRef<Path>>(folder_dir: T) -> Result<Vec<Room>, Box<std::error
 }
 
 fn get_latest_directory() -> Option<PathBuf> {
-    let dir_entries = fs::read_dir("./").unwrap();
+    let dir_entries = match fs::read_dir("./") {
+        Ok(entries) => entries,
+        _ => { eprintln!("Couldn't load the current directory."); return None },
+    };
     //For every file in the current directory
     dir_entries
         //Unwrap and get it's path as a string
