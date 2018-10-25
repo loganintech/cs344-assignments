@@ -1,7 +1,8 @@
+install: build move
+
 build:
 	cargo build --release
 
-install: build move
 
 move:
 	mv target/release/buildrooms .

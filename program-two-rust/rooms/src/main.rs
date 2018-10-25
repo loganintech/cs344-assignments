@@ -68,7 +68,7 @@ impl Room {
         //We are using the `random` crate. This function thread_rng creates well-distributed numbers
         let mut rng = thread_rng();
 
-        while num_vec.len() < capacity || num_vec.len() < 10 {
+        while num_vec.len() < capacity && num_vec.len() < 10 {
             let new_num = (rng.next_u32() % 10) as u8;
             if num_vec.contains(&new_num) {
                 continue;
@@ -84,13 +84,15 @@ impl Room {
             .enumerate()
             //`map` is intended to translate an interator of one type into an iterator of another
             .map(|(index, name_index)| {
+                println!("Index: {}, Capacity: {}", index, capacity);
+
                 //Create a new room with the name_index from the ones we generated earlier
                 Room::new(
                     name_index as u8,
                     //Then match our index. If our index is 0, it's start room. If our index is greater than 0 and less than the total capacity minus the last one, it's a midroom. Otherwise (if it's the last one) it's an endroom
                     match index {
                         0 => RoomType::StartRoom,
-                        x if x > 0 && x < capacity - 1 => RoomType::MidRoom,
+                        x if x < (capacity - 1) => RoomType::MidRoom,
                         _ => RoomType::EndRoom,
                     },
                 )

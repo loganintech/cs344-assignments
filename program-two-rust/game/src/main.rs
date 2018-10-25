@@ -7,7 +7,6 @@ use std::io;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::path::{Path, PathBuf};
 use std::thread;
-use std::time::{SystemTime, UNIX_EPOCH};
 
 //Make an enum and define PartialEq so it can be compared to itself
 #[derive(PartialEq)]
