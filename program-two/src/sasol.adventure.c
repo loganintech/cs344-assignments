@@ -212,10 +212,12 @@ struct Room prompt_and_move(struct Room *rooms, struct Room current_room)
                         printf("Unlocking failed.");
                         fflush(stdout);
                     }
-                    sleep(0);
-                    pthread_mutex_lock(&mutex_lock);
+                    sleep(2);
+		    pthread_mutex_lock(&mutex_lock);
+
                     char *time_string = malloc(sizeof(char) * 1024);
-                    FILE *time_file = fopen("./currentTime.txt", "r");
+                    
+		    FILE *time_file = fopen("./currentTime.txt", "r");
                     memset(time_string, '\0', 1024);
                     size_t len = 1024;
 
@@ -303,14 +305,15 @@ void *write_time()
         memset(time_string, '\0', 200);
         char newline[1] = {'\n'};
 
+
         size_t length = strftime(time_string, 200, "%I:%M%p, %A, %B %e, %Y", right_now);
 
+
         fwrite(time_string, sizeof(char), length, time_file);
-        fwrite(&newline, sizeof(char), 1, time_file);
+	fwrite(&newline, sizeof(char), 1, time_file);
         fclose(time_file);
-
-        pthread_mutex_unlock(&mutex_lock);
-
+	pthread_mutex_unlock(&mutex_lock);
+	sleep(2);
         size_t mutext_trylock = pthread_mutex_trylock(&second_mutex);
         if (mutext_trylock == 0)
         {
@@ -386,7 +389,6 @@ char *get_directory()
 
 int main(char *argv)
 {
-
     char *directory_location = get_directory();
     if(strlen(directory_location) <= 0) {
         perror("Cannot find valid directory in current path.\n");
