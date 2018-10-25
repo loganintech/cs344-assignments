@@ -84,8 +84,6 @@ impl Room {
             .enumerate()
             //`map` is intended to translate an interator of one type into an iterator of another
             .map(|(index, name_index)| {
-                println!("Index: {}, Capacity: {}", index, capacity);
-
                 //Create a new room with the name_index from the ones we generated earlier
                 Room::new(
                     name_index as u8,
