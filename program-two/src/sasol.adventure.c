@@ -371,7 +371,8 @@ char *get_directory()
     }
 
     char *real_filename = malloc(sizeof(char) * 256);
-    strcpy(real_filename, filenames[nameindex]);
+    strcpy(real_filename, "./");
+    strcpy(real_filename + 2, filenames[nameindex]);
 
     int string_index;
     for(string_index = 0; string_index < 200; string_index++) {
