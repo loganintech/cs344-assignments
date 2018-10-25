@@ -18,8 +18,9 @@ pthread_mutex_t mutex_lock;
 pthread_mutex_t second_mutex;
 
 #pragma region loading_files
-
+/*  Name array, same as */
 char *names[10] = {"dungeon", "castle", "shire", "poopdeck", "bedroom", "closet", "narnia", "whiterun", "skyrim", "vault"};
+/* Make us a struct with a name index, conn count, and spaces for chars of other details */
 struct Room
 {
     int name_index;
@@ -29,8 +30,9 @@ struct Room
     char **connections;
 };
 
-char *extract_room_name(char *file_line, int line_length)
+char *extract_line_data(char *file_line, int line_length)
 {
+    /* Move up to the colon, then remove the colon and space. index is now right before the word we're extracting */
     int x, colon_index;
     for (x = 0; x < line_length; x++)
     {
@@ -40,6 +42,7 @@ char *extract_room_name(char *file_line, int line_length)
         }
     }
 
+    /* Get a string for the offset length */
     char *return_string = malloc(sizeof(char) * (line_length - colon_index));
     memset(return_string, '\0', sizeof(char) * (line_length - colon_index));
 
@@ -71,11 +74,13 @@ struct Room parse_file(char *file_path)
 
     char *buffer = malloc(sizeof(char) * 200);
     memset(buffer, '\0', sizeof(char) * 200);
+    /* For every line */
     while ((line_length = getline(&buffer, &len, file)) != -1)
     {
+        /* Get room name */
         if (line_count == 0)
         {
-            char *room_name = extract_room_name(buffer, line_length);
+            char *room_name = extract_line_data(buffer, line_length);
             int x;
             for (x = 0; x < 10; x++)
             {
@@ -86,13 +91,15 @@ struct Room parse_file(char *file_path)
             }
             free(room_name);
         }
+        /* Get room connection */
         else if (buffer[0] == 'C')
         {
-            a_room.connections[a_room.connection_count++] = extract_room_name(buffer, line_length);
+            a_room.connections[a_room.connection_count++] = extract_line_data(buffer, line_length);
         }
+        /* Get room type */
         else
         {
-            a_room.room_type = extract_room_name(buffer, line_length);
+            a_room.room_type = extract_line_data(buffer, line_length);
         }
 
         line_count++;
@@ -127,18 +134,17 @@ struct Room *read_files(char *path)
     int room_index = 0;
     if (directory != NULL)
     {
+        /* For every directory in the current directory */
         while (dirent_struct = readdir(directory))
         {
+            /* Get a file's path */
             char *dir_path = malloc(sizeof(dirent_struct->d_name) + 250);
             memset(dir_path, '\0', sizeof(dir_path));
             sprintf(dir_path, "%s/%s", cwd, dirent_struct->d_name);
             if (dirent_struct->d_name[0] != '.' && strcmp(dirent_struct->d_name, "currentTime.txt") != 0)
             {
-                /* printf("Reading File: %s\n", dirent_struct->d_name); */
-                /* printf("About to parse file: %s\n", dirent_struct->d_name); */
+                /* Parse the room */
                 rooms[room_index++] = parse_file(dir_path);
-                /* print_room(rooms[room_index - 1]); */
-                /* printf("Just parsed file: %s\n", dirent_struct->d_name); */
             }
             free(dir_path);
         }
@@ -153,7 +159,7 @@ struct Room *read_files(char *path)
 
     return rooms;
 }
-
+/* Was useful during debugging. No real reason to delete, but no usage currently */
 void print_room(struct Room room)
 {
 
@@ -177,6 +183,7 @@ struct Room prompt_and_move(struct Room *rooms, struct Room current_room)
     printf("POSSIBLE CONNECTIONS: ");
 
     int connection_index;
+    /* Print possible moves */
     for (connection_index = 0; connection_index < current_room.connection_count - 1; connection_index++)
     {
         printf("%s, ", current_room.connections[connection_index]);
@@ -191,17 +198,22 @@ struct Room prompt_and_move(struct Room *rooms, struct Room current_room)
 
     name_buffer[strlen(name_buffer) - 1] = '\0';
 
+    /* For every possible connection */
     for (connection_index = 0; connection_index < current_room.connection_count; connection_index++)
     {
+        /* See if the choice is valid */
         if (strcmp(name_buffer, current_room.connections[connection_index]) == 0 || strcmp(name_buffer, "time") == 0)
         {
             int new_room_index;
+
+            /* We know they picked a valid room now. Let's find its index and move */
             for (new_room_index = 0; new_room_index < 7; new_room_index++)
             {
                 if (strcmp(name_buffer, names[rooms[new_room_index].name_index]) == 0)
                 {
                     return rooms[new_room_index];
                 }
+                /* If they pick time */
                 else if (strcmp(name_buffer, "time") == 0)
                 {
                     /* printf("Unlocking mutex.\n"); fflush(stdout); */
@@ -212,15 +224,19 @@ struct Room prompt_and_move(struct Room *rooms, struct Room current_room)
                         printf("Unlocking failed.");
                         fflush(stdout);
                     }
+                    /* Give the second thread time to grab the mutex */
                     sleep(2);
-		    pthread_mutex_lock(&mutex_lock);
+                    /* Then wait to grab the mutex back */
+                    pthread_mutex_lock(&mutex_lock);
 
                     char *time_string = malloc(sizeof(char) * 1024);
-                    
-		    FILE *time_file = fopen("./currentTime.txt", "r");
+
+                    /* Open the file for reading */
+                    FILE *time_file = fopen("./currentTime.txt", "r");
                     memset(time_string, '\0', 1024);
                     size_t len = 1024;
 
+                    /* Get the time line and print it out */
                     size_t line_length = getline(&time_string, &len, time_file);
                     time_string[line_length - 1] = '\0';
 
@@ -244,6 +260,7 @@ void run_game(struct Room *rooms)
 
     int i;
     int room_count = 7;
+    /* Find our starting room */
     for (i = 0; i < room_count; i++)
     {
         if (rooms[i].room_type[0] == 'S')
@@ -263,6 +280,7 @@ void run_game(struct Room *rooms)
         printf("\n");
         path_taken[steps_taken] = current_room.name_index;
 
+        /* Only add steps taken if it's a new path. This always increments at 0, and ignores repeated paths */
         if (steps_taken == 0 || (steps_taken > 0 && path_taken[steps_taken] != path_taken[steps_taken - 1]))
         {
             steps_taken++;
@@ -273,6 +291,7 @@ void run_game(struct Room *rooms)
     printf("You completed the game in %d steps.\nPath taken:\n", steps_taken);
 
     int path_step;
+    /* Print all the paths */
     for (path_step = 0; path_step < steps_taken; path_step++)
     {
         printf("%s\n", names[path_taken[path_step]]);
@@ -287,38 +306,45 @@ void *write_time()
 {
     while (true)
     {
+        /* Lock our mutex */
         int lock_result = pthread_mutex_lock(&mutex_lock);
         if (lock_result != 0)
         {
             printf("Error locking in second thread.\n");
         }
 
+        /* Try to lock the second (unlocked in main) if you can, break */
+        size_t mutext_trylock = pthread_mutex_trylock(&second_mutex);
+        if (mutext_trylock == 0)
+        {
+            break;
+        }
+
+        /* Open our file */
         FILE *time_file = fopen("./currentTime.txt", "w");
 
         const struct tm *right_now;
         time_t rawtime;
         time(&rawtime);
 
+        /* Get our time */
         right_now = localtime(&rawtime);
 
         char time_string[200];
         memset(time_string, '\0', 200);
         char newline[1] = {'\n'};
 
-
+        /* Format our time */
         size_t length = strftime(time_string, 200, "%I:%M%p, %A, %B %e, %Y", right_now);
 
-
+        /* Write the time */
         fwrite(time_string, sizeof(char), length, time_file);
-	fwrite(&newline, sizeof(char), 1, time_file);
+        fwrite(&newline, sizeof(char), 1, time_file);
+        /* Close the file */
         fclose(time_file);
-	pthread_mutex_unlock(&mutex_lock);
-	sleep(2);
-        size_t mutext_trylock = pthread_mutex_trylock(&second_mutex);
-        if (mutext_trylock == 0)
-        {
-            break;
-        }
+        pthread_mutex_unlock(&mutex_lock);
+        /* Let the other thread lock the mutex */
+        sleep(2);
     }
 
     return NULL;
@@ -331,6 +357,7 @@ char *get_directory()
     struct dirent *dirent_struct;
     directory = opendir("./");
 
+    /* Make space for a place to put in-dir filenames */
     char **filenames = malloc(sizeof(char *) * 200);
     memset(filenames, '\0', 200);
     int filename;
@@ -344,23 +371,29 @@ char *get_directory()
     int mtime = 0;
     int nameindex = 0;
 
+    /* If we can actually open our own dir */
     if (directory != NULL)
     {
+        /* Read through every file */
         while (dirent_struct = readdir(directory))
         {
+            /* Ignore anything starting with . */
             if (dirent_struct->d_name[0] == '.')
                 continue;
 
+            /* See if the format is correct */
             if (strlen(dirent_struct->d_name) <= 12 || dirent_struct->d_name[5] != '.' || dirent_struct->d_name[11] != '.')
                 continue;
 
             struct stat fileStat;
+            /* Get the stat of this dir */
             if (stat(dirent_struct->d_name, &fileStat) < 0)
             {
                 printf("Stat didn't work for file %s.", dirent_struct->d_name);
                 continue;
             }
 
+            /* If the currently selected dir is newer, set that as the one to save */
             if (mtime < fileStat.st_mtime)
             {
                 mtime = fileStat.st_mtime;
@@ -373,12 +406,18 @@ char *get_directory()
         closedir(directory);
     }
 
+    /* Make space for our filename. */
     char *real_filename = malloc(sizeof(char) * 256);
+
+    /* Copy `./` to the filename */
     strcpy(real_filename, "./");
+
+    /* Copy the actual folder name to everything after `./` */
     strcpy(real_filename + 2, filenames[nameindex]);
 
     int string_index;
-    for(string_index = 0; string_index < 200; string_index++) {
+    for (string_index = 0; string_index < 200; string_index++)
+    {
         free(filenames[string_index]);
     }
 
@@ -389,13 +428,16 @@ char *get_directory()
 
 int main(char *argv)
 {
+    /* Get our directory location */
     char *directory_location = get_directory();
-    if(strlen(directory_location) <= 0) {
+    if (strlen(directory_location) <= 0)
+    {
         perror("Cannot find valid directory in current path.\n");
         free(directory_location);
         return 3;
     }
 
+    /* Read and parse the files from the directory */
     struct Room *rooms = read_files(directory_location);
     free(directory_location);
     if (pthread_mutex_init(&mutex_lock, NULL) != 0)
@@ -403,15 +445,19 @@ int main(char *argv)
         printf("Mutex creation failed.\n");
         return 1;
     }
+    /* Lock our mutex */
     pthread_mutex_lock(&mutex_lock);
 
+    /* Make a second mutex */
     if (pthread_mutex_init(&second_mutex, NULL) != 0)
     {
         printf("Mutex creation failed.\n");
         return 2;
     }
+    /* Lock that one too */
     pthread_mutex_lock(&second_mutex);
 
+    /* Create our other thread */
     int pthread_err = pthread_create(&thread_id, NULL, write_time, NULL);
     if (pthread_err != 0)
     {
@@ -419,10 +465,14 @@ int main(char *argv)
     }
 
     run_game(rooms);
+    /* Unlcok the first mutex */
     pthread_mutex_unlock(&mutex_lock);
+    /* Unlock the second. This causes the second thread to exit */
     pthread_mutex_unlock(&second_mutex);
+    /* And, wait for it to exit. */
     pthread_join(thread_id, NULL);
 
+    /* Delete everything */
     int room_index, connection_index;
     for (room_index = 0; room_index < 7; room_index++)
     {
