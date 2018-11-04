@@ -1,11 +1,12 @@
-program-one-rust/target
-program-one-rust/*.txt
-program-one-rust/matrix.sh
+**/target
+**/*.txt
+**/matrix.sh
 
-program-py-rust/target
-program-py-rust/*.txt
+**/target
+**/*.txt
 
-program-two-rust/**/target
-program-two-rust/**/*.txt
+**/**/target
+**/**/*.txt
 
 **/*_room
+**/*.exe
