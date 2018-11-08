@@ -108,10 +108,10 @@ int main(int argc, char *argv[])
                     continue;
                 }
 
-                if (strcmp(token, "&&") == 0)
+                if (strcmp(token, "$$") == 0)
                 {
                     sprintf(pid_token, "%d", parent);
-
+                    printf("PID_Token: '%s'", pid_token); fflush(stdout);
                     args[arg_index++] = pid_token;
                 } else {
 
