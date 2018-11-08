@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Couldn't read current working directory.");
         fflush(stderr);
     }
-
+    int last_status;
     char *command = malloc(sizeof(char) * 2048);
     char *tokenizer_buffer = malloc(sizeof(char) * 2048);
 
@@ -86,6 +86,8 @@ int main(int argc, char *argv[])
         {
             printf("CWD: %s\n", cwd);
             fflush(stdout);
+	    printf("Last Exited Status: %d\n", last_status);
+	    fflush(stdout);
         }
         else if (program_name[0] == '#')
         {
@@ -93,35 +95,28 @@ int main(int argc, char *argv[])
         else
         {
             pid_t parent = getpid();
-            pid_t child = fork();
             char *token;
             char *args[512];
             int arg_index = 0;
             args[arg_index++] = program_name;
-            char *pid_token = malloc(sizeof(char) * 8);
+            char pid_token[8];
             memset(pid_token, '\0', sizeof(pid_token));
             while (token = strtok_r(NULL, cmd_delim, &tokenizer_buffer))
             {
-                printf("Token: '%s'\n", token);
-
-                if(strcmp(token, args[arg_index]) == 0) {
+                 if(strcmp(token, args[arg_index - 1]) == 0) {
                     continue;
                 }
-
+		
                 if (strcmp(token, "$$") == 0)
                 {
                     sprintf(pid_token, "%d", parent);
-                    printf("PID_Token: '%s'", pid_token); fflush(stdout);
                     args[arg_index++] = pid_token;
                 } else {
-
-
-
                     args[arg_index++] = token;
                 }
+		            }
 
-
-            }
+	    pid_t child = fork();
 
             if (child == -1)
             {
@@ -130,13 +125,12 @@ int main(int argc, char *argv[])
             }
             else if (child > 0)
             {
-                int status;
-                waitpid(child, &status, 0);
+                 waitpid(child, &last_status, 0);
             }
             else
             {
                 //In the child
-                int result = execvp(program_name, args);
+  		int result = execvp(program_name, args);
                 printf("Command ran: %d\n", result);
             }
         }
