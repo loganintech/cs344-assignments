@@ -97,11 +97,8 @@ int main(int argc, char *argv[])
             args[arg_index++] = program_name;
             while (token = strtok_r(NULL, cmd_delim, &tokenizer_buffer))
             {
-                if (token == NULL)
-                {
-                    printf("Token was null.\n");
-                    fflush(stdout);
-                    break;
+                if (strcmp(token, "&&") == 0) {
+                    token = sprintf(token, "%d", parent);
                 }
                 args[arg_index++] = token;
             }
