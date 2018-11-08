@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Couldn't read current working directory.");
         fflush(stderr);
     }
-    int last_status;
+    int last_status = 0;
     char *command = malloc(sizeof(char) * 2048);
     char *tokenizer_buffer = malloc(sizeof(char) * 2048);
 
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 
         prompt_and_read(command);
 
-        char *program_name = strtok_r(command, cmd_delim, &tokenizer_buffer);
+        char *program_name = (char*) strtok_r(command, cmd_delim, &tokenizer_buffer);
 
         if (strcmp(program_name, "exit") == 0)
         {
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
         }
         else if (strcmp(program_name, "cd") == 0)
         {
-            char *dir = strtok_r(NULL, cmd_delim, &tokenizer_buffer);
+            char *dir = (char*) strtok_r(NULL, cmd_delim, &tokenizer_buffer);
 
             if (dir == NULL)
             {
@@ -91,19 +91,22 @@ int main(int argc, char *argv[])
             printf("Last Exited Status: %d\n", last_status);
             fflush(stdout);
         }
-        else if (program_name[0] == '#')
-        {
-        }
-        else
+        else if (program_name[0] != '#')
         {
             pid_t parent = getpid();
+
             char *token;
             char *args[512];
+            memset(args, '\0', 512);
+
             int arg_index = 0;
             args[arg_index++] = program_name;
+
+
             char pid_token[8];
-            memset(pid_token, '\0', sizeof(pid_token));
-            while (token = strtok_r(NULL, cmd_delim, &tokenizer_buffer))
+            memset(pid_token, '\0', 8);
+
+            while (token = (char*) strtok_r(NULL, cmd_delim, &tokenizer_buffer))
             {
                 if (strcmp(token, args[arg_index - 1]) == 0)
                 {
@@ -131,7 +134,7 @@ int main(int argc, char *argv[])
             else if (child > 0)
             {
                 //In the parent
-                if(args[arg_index - 1][0] != '&') {
+                if (args[arg_index - 1][0] != '&') {
                     waitpid(child, &last_status, 0);
                 }
                 else {
@@ -146,8 +149,7 @@ int main(int argc, char *argv[])
                                 background_processes[x] = background_processes[x + 1];
                             }
 
-                            background_processes[background_process_index - 2] = NULL;
-
+                            background_processes[background_process_index - 2] = 0;
                         }
                     }
                 }
@@ -155,10 +157,14 @@ int main(int argc, char *argv[])
             else
             {
                 //In the child
-                if(args[arg_index - 1][0] == '&') {
-                    args[arg_index - 1] = NULL;
-                    arg_index--;
+                if (args[arg_index - 1][0] == '&') {
+                    args[--arg_index] = NULL;
                 }
+                printf("Program Name: '%s'\n", program_name);
+
+                for(int i = 0; i < arg_index; i++)
+                    printf("Arg: '%s'\n", args[i]);
+
                 int result = execvp(program_name, args);
                 printf("Command ran: %d\n", result);
             }
