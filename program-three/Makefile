@@ -1,10 +1,10 @@
-build: smallsh
+build: small
 
 test: build
-	./grading_script.sh smallsh.out
+	./grading_script.sh smallsh
 
-smallsh:
-	gcc -ggdb -o smallsh.out src/smallsh.c
+small:
+	gcc -ggdb -o smallsh src/smallsh.c
 
 clean:
-	rm smallsh.out
+	rm smallsh
