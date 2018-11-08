@@ -155,6 +155,10 @@ int main(int argc, char *argv[])
             else
             {
                 //In the child
+                if(args[arg_index - 1][0] == '&') {
+                    args[arg_index - 1] = NULL;
+                    args_index--;
+                }
                 int result = execvp(program_name, args);
                 printf("Command ran: %d\n", result);
             }
