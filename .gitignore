@@ -12,3 +12,4 @@
 **/*.exe
 
 **/*.out
+**/smallsh*
