@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
         fflush(stderr);
     }
 
-    char *command          = malloc(sizeof(char) * 2048);
+    char *command = malloc(sizeof(char) * 2048);
     char *tokenizer_buffer = malloc(sizeof(char) * 2048);
 
     while (true)
@@ -87,7 +87,9 @@ int main(int argc, char *argv[])
             printf("CWD: %s\n", cwd);
             fflush(stdout);
         }
-	else if (program_name[0] == '#') {}
+        else if (program_name[0] == '#')
+        {
+        }
         else
         {
             pid_t parent = getpid();
@@ -97,14 +99,18 @@ int main(int argc, char *argv[])
             int arg_index = 0;
             args[arg_index++] = program_name;
             while (token = strtok_r(NULL, cmd_delim, &tokenizer_buffer))
-	    {
-	        if (token == NULL) break;
-                if (strcmp(token, "&&") == 0) {
+            {
+                if (token == NULL)
+                    break;
+                if (strcmp(token, "&&") == 0)
+                {
                     sprintf(token, "%d", parent);
                 }
-		if (strcmp(token, args[arg_index - 1]) == 0) break;
-		printf("Adding token: '%s'\n", token); fflush(stdout);
-		args[arg_index++] = token;
+                if (strcmp(token, args[arg_index - 1]) == 0)
+                    break;
+                printf("Adding token: '%s'\n", token);
+                fflush(stdout);
+                args[arg_index++] = token;
             }
 
             if (child == -1)
