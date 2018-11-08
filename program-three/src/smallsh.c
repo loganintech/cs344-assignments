@@ -98,19 +98,29 @@ int main(int argc, char *argv[])
             char *args[512];
             int arg_index = 0;
             args[arg_index++] = program_name;
+            char *pid_token = malloc(sizeof(char) * 8);
+            memset(pid_token, '\0', sizeof(pid_token));
             while (token = strtok_r(NULL, cmd_delim, &tokenizer_buffer))
             {
-                if (token == NULL)
-                    break;
+                printf("Token: '%s'\n", token);
+
+                if(strcmp(token, args[arg_index]) == 0) {
+                    continue;
+                }
+
                 if (strcmp(token, "&&") == 0)
                 {
-                    sprintf(token, "%d", parent);
+                    sprintf(pid_token, "%d", parent);
+
+                    args[arg_index++] = pid_token;
+                } else {
+
+
+
+                    args[arg_index++] = token;
                 }
-                if (strcmp(token, args[arg_index - 1]) == 0)
-                    break;
-                printf("Adding token: '%s'\n", token);
-                fflush(stdout);
-                args[arg_index++] = token;
+
+
             }
 
             if (child == -1)
