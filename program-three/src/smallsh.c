@@ -24,6 +24,8 @@ int main(int argc, char *argv[])
 {
 
     char cwd[2048];
+    pid_t background_processes[512];
+    int background_process_index = 0;
     if (getcwd(cwd, sizeof(cwd)) == NULL)
     {
         fprintf(stderr, "Couldn't read current working directory.");
@@ -128,7 +130,27 @@ int main(int argc, char *argv[])
             }
             else if (child > 0)
             {
-                waitpid(child, &last_status, 0);
+                //In the parent
+                if(args[arg_index - 1][0] != '&') {
+                    waitpid(child, &last_status, 0);
+                }
+                else {
+                    background_processes[background_process_index++] = child;
+
+                    for(int i = 0; i < background_process_index; i++) {
+
+                        pid_t result = waitpid(background_processes[i], &last_status, WNOHANG);
+                        if (result == 0) {
+
+                            for(int x = i; x < background_process_index - 1; x++) {
+                                background_processes[x] = background_processes[x + 1];
+                            }
+
+                            background_processes[background_process_index - 2] = NULL;
+
+                        }
+                    }
+                }
             }
             else
             {
