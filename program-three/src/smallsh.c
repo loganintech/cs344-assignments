@@ -86,8 +86,8 @@ int main(int argc, char *argv[])
         {
             printf("CWD: %s\n", cwd);
             fflush(stdout);
-	    printf("Last Exited Status: %d\n", last_status);
-	    fflush(stdout);
+            printf("Last Exited Status: %d\n", last_status);
+            fflush(stdout);
         }
         else if (program_name[0] == '#')
         {
@@ -103,20 +103,23 @@ int main(int argc, char *argv[])
             memset(pid_token, '\0', sizeof(pid_token));
             while (token = strtok_r(NULL, cmd_delim, &tokenizer_buffer))
             {
-                 if(strcmp(token, args[arg_index - 1]) == 0) {
+                if (strcmp(token, args[arg_index - 1]) == 0)
+                {
                     continue;
                 }
-		
+
                 if (strcmp(token, "$$") == 0)
                 {
                     sprintf(pid_token, "%d", parent);
                     args[arg_index++] = pid_token;
-                } else {
+                }
+                else
+                {
                     args[arg_index++] = token;
                 }
-		            }
+            }
 
-	    pid_t child = fork();
+            pid_t child = fork();
 
             if (child == -1)
             {
@@ -125,12 +128,12 @@ int main(int argc, char *argv[])
             }
             else if (child > 0)
             {
-                 waitpid(child, &last_status, 0);
+                waitpid(child, &last_status, 0);
             }
             else
             {
                 //In the child
-  		int result = execvp(program_name, args);
+                int result = execvp(program_name, args);
                 printf("Command ran: %d\n", result);
             }
         }
