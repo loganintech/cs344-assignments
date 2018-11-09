@@ -26,7 +26,7 @@ pub fn change_directory(dir: Option<&str>) -> Option<PathBuf> {
             }
         }
         None => match set_current_dir(home_dir().unwrap()) {
-            Ok(_) => Some(home_dir().unwrap().into()),
+            Ok(_) => Some(home_dir().unwrap()),
             _ => return None,
         },
     }

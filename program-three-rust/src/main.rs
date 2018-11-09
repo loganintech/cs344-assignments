@@ -2,13 +2,14 @@ extern crate dirs;
 
 use std::process::Command;
 use std::io::{self, BufRead, BufReader, Read, Write};
-use std::fs::{ReadDir, read_dir};
 
 use std::env::{current_dir};
-use std::path::{Path, PathBuf};
 
 mod builtins;
+mod process_pool;
 
+use builtins::cd::change_directory;
+use builtins::status::status;
 
 fn main() -> Result<(), Box<std::error::Error>> {
 
@@ -22,20 +23,23 @@ fn main() -> Result<(), Box<std::error::Error>> {
 
         match program {
             "cd" => {
-                if let Some(new_path) = builtins::cd::change_directory(command_parts.next()) {
+                if let Some(new_path) = change_directory(command_parts.next()) {
                     current_path = new_path;
                 }
-            }
+            },
             "status" => {
-                builtins::status::status(&current_path);
-            }
+                status(&current_path);
+            },
+            "exit" => {
+                break;
+            },
             //Run arbitrary command
             _ => {
 
             }
 
         }
- 
+
 
     }
 
