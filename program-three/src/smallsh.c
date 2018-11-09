@@ -10,6 +10,7 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <fcntl.h>
 
 #define true 1
 #define false 0
@@ -23,6 +24,7 @@ void prompt_and_read(char *buffer);
 int main(int argc, char *argv[])
 {
 
+    int null_file = open("/dev/null", O_WRONLY);
     char cwd[2048];
     pid_t background_processes[512];
     int background_process_index = 0;
@@ -42,7 +44,9 @@ int main(int argc, char *argv[])
 
         prompt_and_read(command);
 
-        char *program_name = (char*) strtok_r(command, cmd_delim, &tokenizer_buffer);
+        printf("Input: '%s'\n", command); fflush(stdout);
+        char *program_name = strtok_r(command, cmd_delim, &tokenizer_buffer);
+        printf("Program Name: '%s'\n", program_name); fflush(stdout);
 
         if (strcmp(program_name, "exit") == 0)
         {
@@ -93,18 +97,20 @@ int main(int argc, char *argv[])
         }
         else if (program_name[0] != '#')
         {
+            printf("Getting PID\n"); fflush(stdout);
             pid_t parent = getpid();
 
             char *token;
             char *args[512];
             memset(args, '\0', 512);
-
+            printf("Memset the Args\n"); fflush(stdout);
             int arg_index = 0;
             args[arg_index++] = program_name;
 
-
             char pid_token[8];
             memset(pid_token, '\0', 8);
+
+            printf("Memset PID_token\n"); fflush(stdout);
 
             while (token = (char*) strtok_r(NULL, cmd_delim, &tokenizer_buffer))
             {
@@ -112,7 +118,6 @@ int main(int argc, char *argv[])
                 {
                     continue;
                 }
-
                 if (strcmp(token, "$$") == 0)
                 {
                     sprintf(pid_token, "%d", parent);
@@ -140,11 +145,18 @@ int main(int argc, char *argv[])
                 else {
                     background_processes[background_process_index++] = child;
 
+                    printf("Backgrounded Process: %d\n", child); fflush(stdout);
+
+                    // Redirect stdin and stdout to /dev/null for background processes
+                    // dup2(null_file, 1);
+                    // dup2(null_file, 0);
+
                     for(int i = 0; i < background_process_index; i++) {
 
                         pid_t result = waitpid(background_processes[i], &last_status, WNOHANG);
                         if (result == 0) {
 
+                            printf("Process Completed: %d\n", background_processes[i]); fflush(stdout);
                             for(int x = i; x < background_process_index - 1; x++) {
                                 background_processes[x] = background_processes[x + 1];
                             }
@@ -160,10 +172,10 @@ int main(int argc, char *argv[])
                 if (args[arg_index - 1][0] == '&') {
                     args[--arg_index] = NULL;
                 }
-                printf("Program Name: '%s'\n", program_name);
+                // printf("Program Name: '%s'\n", program_name);
 
-                for(int i = 0; i < arg_index; i++)
-                    printf("Arg: '%s'\n", args[i]);
+                // for(int i = 0; i < arg_index; i++)
+                //     printf("Arg: '%s'\n", args[i]);
 
                 int result = execvp(program_name, args);
                 printf("Command ran: %d\n", result);
