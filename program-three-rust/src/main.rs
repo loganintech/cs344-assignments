@@ -1,22 +1,17 @@
 extern crate dirs;
 
-use std::process::Command;
-use std::io::{self, BufRead, BufReader, Read, Write};
-
-use std::env::{current_dir};
+use std::env::current_dir;
+use std::io::{self, BufRead, Write};
 
 mod builtins;
 mod process_pool;
 
-use builtins::cd::change_directory;
-use builtins::status::status;
+use self::builtins::{cd::change_directory, status::status};
 
 fn main() -> Result<(), Box<std::error::Error>> {
-
     let mut current_path = current_dir()?;
 
     loop {
-
         let command = prompt().unwrap();
         let mut command_parts = command.split_whitespace();
         let program = command_parts.next().unwrap();
@@ -26,26 +21,20 @@ fn main() -> Result<(), Box<std::error::Error>> {
                 if let Some(new_path) = change_directory(command_parts.next()) {
                     current_path = new_path;
                 }
-            },
+            }
             "status" => {
                 status(&current_path);
-            },
+            }
             "exit" => {
                 break;
-            },
-            //Run arbitrary command
-            _ => {
-
             }
-
+            //Run arbitrary command
+            _ => {}
         }
-
-
     }
 
     Ok(())
 }
-
 
 fn prompt() -> Option<String> {
     print!(": ");
