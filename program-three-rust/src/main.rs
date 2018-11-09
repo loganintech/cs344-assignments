@@ -27,7 +27,7 @@ fn main() -> Result<(), Box<std::error::Error>> {
                 }
             }
             "status" => {
-                println!("CWD: {}", current_path.to_str().unwrap());
+                builtins::status::status(&current_path);
             }
             //Run arbitrary command
             _ => {
@@ -35,7 +35,7 @@ fn main() -> Result<(), Box<std::error::Error>> {
             }
 
         }
-
+ 
 
     }
 
