@@ -1,39 +1,50 @@
+extern crate dirs;
+
 use std::process::Command;
 use std::io::{self, BufRead, BufReader, Read, Write};
-use std::fs::{ReadDir, read_dir}
+use std::fs::{ReadDir, read_dir};
 
-fn main() {
+use std::env::{current_dir};
+use std::path::{Path, PathBuf};
+
+mod builtins;
+
+
+fn main() -> Result<(), Box<std::error::Error>> {
+
+    let mut current_path = current_dir()?;
 
     loop {
 
-        match prompt() {
-            Some(command) if command == "cd" => {
-                for entry in fs::read_dir() {
+        let command = prompt().unwrap();
+        let mut command_parts = command.split_whitespace();
+        let program = command_parts.next().unwrap();
 
+        match program {
+            "cd" => {
+                if let Some(new_path) = builtins::cd::change_directory(command_parts.next()) {
+                    current_path = new_path;
                 }
-            },
-            Some(command) if command == "ls" => {
-
-            },
-            Some(command) => {
-
-            },
-            None => {
+            }
+            "status" => {
+                println!("CWD: {}", current_path.to_str().unwrap());
+            }
+            //Run arbitrary command
+            _ => {
 
             }
+
         }
 
-        if let None = prompt() {
-            break;
-        }
 
     }
 
+    Ok(())
 }
 
 
 fn prompt() -> Option<String> {
-    println!("$");
+    print!(": ");
     io::stdout().flush().unwrap();
 
     let mut buffer = String::new();
@@ -46,8 +57,5 @@ fn prompt() -> Option<String> {
     //Trim buffer to take whitespace off of the right-side of a string
     let buffer = buffer.trim_right();
 
-    //Print a line
-    println!("");
-
-    Some(buffer)
+    Some(buffer.into())
 }
