@@ -1,3 +1,5 @@
+#![feature(drain_filter)]
+
 extern crate dirs;
 
 use std::env::current_dir;
@@ -10,6 +12,7 @@ use self::builtins::{cd::change_directory, status::status};
 
 fn main() -> Result<(), Box<std::error::Error>> {
     let mut current_path = current_dir()?;
+    let mut pool = process_pool::ProcessPool::new();
 
     loop {
         let command = prompt().unwrap();
@@ -23,13 +26,15 @@ fn main() -> Result<(), Box<std::error::Error>> {
                 }
             }
             "status" => {
-                status(&current_path);
+                status(&current_path, &pool);
             }
             "exit" => {
                 break;
             }
             //Run arbitrary command
-            _ => {}
+            _ => {
+                pool.add(program, command_parts.collect());
+            }
         }
     }
 
