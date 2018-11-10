@@ -1,3 +1,3 @@
-[submodule "smallsh"]
+[submodule "program-three-rust"]
 	path = program-three-rust
 	url = git@github.com:loganintech/smallsh.git
