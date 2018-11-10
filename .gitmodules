@@ -1,0 +1,3 @@
+[submodule "smallsh"]
+	path = program-three-rust
+	url = git@github.com:loganintech/smallsh.git
