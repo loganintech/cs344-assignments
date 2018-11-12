@@ -21,7 +21,7 @@ const char *cmd_delim = " ";
 
 void prompt_and_read(char *buffer);
 int get_input_redirection(char *buffer[], int *buffer_length);
-int get_output_redirection(char *buffer[], int *buffer_length);
+int get_output_redirection(char **buffer, int *buffer_length);
 
 int main(int argc, char *argv[])
 {
@@ -46,9 +46,9 @@ int main(int argc, char *argv[])
 
         prompt_and_read(command);
 
-        printf("Input: '%s'\n", command); fflush(stdout);
+        // printf("Input: '%s'\n", command); fflush(stdout);
         char *program_name = strtok_r(command, cmd_delim, &tokenizer_buffer);
-        printf("Program Name: '%s'\n", program_name); fflush(stdout);
+        // printf("Program Name: '%s'\n", program_name); fflush(stdout);
 
         if (strcmp(program_name, "exit") == 0)
         {
@@ -99,20 +99,20 @@ int main(int argc, char *argv[])
         }
         else if (program_name[0] != '#')
         {
-            printf("Getting PID\n"); fflush(stdout);
+            // printf("Getting PID\n"); fflush(stdout);
             pid_t parent = getpid();
 
             char *token;
             char *args[512];
             memset(args, '\0', 512);
-            printf("Memset the Args\n"); fflush(stdout);
+            // printf("Memset the Args\n"); fflush(stdout);
             int arg_index = 0;
             args[arg_index++] = program_name;
 
             char pid_token[8];
             memset(pid_token, '\0', 8);
 
-            printf("Memset PID_token\n"); fflush(stdout);
+            // printf("Memset PID_token\n"); fflush(stdout);
 
             while (token = (char*) strtok_r(NULL, cmd_delim, &tokenizer_buffer))
             {
@@ -131,10 +131,6 @@ int main(int argc, char *argv[])
                 }
             }
 
-
-            int input_descriptor = get_input_redirection(args, &arg_index);
-            int output_descriptor = get_output_redirection(args, &arg_index);
-
             pid_t child = fork();
 
             if (child == -1)
@@ -152,12 +148,6 @@ int main(int argc, char *argv[])
                     background_processes[background_process_index++] = child;
 
                     printf("Backgrounded Process: %d\n", child); fflush(stdout);
-
-
-                    // Redirect stdin and stdout to /dev/null for background processes
-                    dup2(null_file, 1);
-                    // dup2(null_file, 0);
-
                 }
             }
             else
@@ -168,11 +158,18 @@ int main(int argc, char *argv[])
                 }
                 // printf("Program Name: '%s'\n", program_name);
 
-                // for(int i = 0; i < arg_index; i++)
-                //     printf("Arg: '%s'\n", args[i]);
+                int input_descriptor = get_input_redirection(args, &arg_index);
+                // printf("Arg Index: %d\n", arg_index); fflush(stdout);
+                int output_descriptor = get_output_redirection(args, &arg_index);
+                // printf("Arg Index: %d\n", arg_index); fflush(stdout);
+
+                dup2(input_descriptor, 0);
+                dup2(output_descriptor, 1);
 
                 int result = execvp(program_name, args);
-                printf("Command ran: %d\n", result);
+                close(output_descriptor);
+                close(input_descriptor);
+                // printf("Command ran: %d\n", result);
             }
         }
 
@@ -201,46 +198,55 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-int get_input_redirection(char *buffer[], int *buffer_length) {
+int get_input_redirection(char **buffer, int *buffer_length)
+{
+
+    // printf("Buffer Len: %d\n", *buffer_length);
+    fflush(stdout);
 
     int found = 0;
-    for(int i = 0; i < *buffer_length - 1; i++) {
-
-        if (strcmp(buffer[i], "<") == 0) {
+    for (int i = 0; i < (*buffer_length) - 1; i++)
+    {
+        // printf("Checking buffer: %s\n", buffer[i]);
+        fflush(stdout);
+        if (strcmp(buffer[i], "<") == 0)
+        {
             found = i;
         }
-
     }
 
     int file_desc;
 
-    if (found != 0) {
+    if (found != 0)
+    {
         file_desc = open(buffer[found + 1], O_RDONLY);
-    } else {
-        file_desc = open("/dev/null", O_RDONLY);
+    }
+    else
+    {
+        //stdout
+        return 1;
     }
 
-    for(int i = found; i < *buffer_length - 2; i++) {
+    for (int i = found; i < (*buffer_length) - 2; i++)
+    {
 
         buffer[i] = buffer[i + 2];
-
     }
 
     buffer[*buffer_length - 2] = NULL;
     buffer[*buffer_length - 1] = NULL;
 
-    buffer_length = buffer_length - 2;
+    *buffer_length = *buffer_length - 2;
     return file_desc;
-
-
 }
+int get_output_redirection(char **buffer, int *buffer_length) {
 
-int get_output_redirection(char *buffer[], int *buffer_length) {
+    // printf("Buffer Len: %d\n", *buffer_length); fflush(stdout);
 
     int found = 0;
-    for (int i = 0; i < *buffer_length - 1; i++)
+    for (int i = 0; i < (*buffer_length) - 1; i++)
     {
-
+        // printf("Checking buffer: %s\n", buffer[i]); fflush(stdout);
         if (strcmp(buffer[i], ">") == 0)
         {
             found = i;
@@ -251,14 +257,15 @@ int get_output_redirection(char *buffer[], int *buffer_length) {
 
     if (found != 0)
     {
-        file_desc = open(buffer[found + 1], O_WRONLY);
+        file_desc = open(buffer[found + 1], O_WRONLY | O_CREAT);
     }
     else
     {
-        file_desc = open("/dev/null", O_WRONLY);
+        //stdout
+        return 1;
     }
 
-    for (int i = found; i < *buffer_length - 2; i++)
+    for (int i = found; i < (*buffer_length) - 2; i++)
     {
 
         buffer[i] = buffer[i + 2];
@@ -267,7 +274,7 @@ int get_output_redirection(char *buffer[], int *buffer_length) {
     buffer[*buffer_length - 2] = NULL;
     buffer[*buffer_length - 1] = NULL;
 
-    buffer_length = buffer_length - 2;
+    *buffer_length = *buffer_length - 2;
     return file_desc;
 }
 
