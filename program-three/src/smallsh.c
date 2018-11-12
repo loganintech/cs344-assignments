@@ -20,6 +20,8 @@ char prompt_string = ':';
 const char *cmd_delim = " ";
 
 void prompt_and_read(char *buffer);
+int get_input_redirection(char *buffer[], int *buffer_length);
+int get_output_redirection(char *buffer[], int *buffer_length);
 
 int main(int argc, char *argv[])
 {
@@ -129,6 +131,10 @@ int main(int argc, char *argv[])
                 }
             }
 
+
+            int input_descriptor = get_input_redirection(args, &arg_index);
+            int output_descriptor = get_output_redirection(args, &arg_index);
+
             pid_t child = fork();
 
             if (child == -1)
@@ -147,23 +153,11 @@ int main(int argc, char *argv[])
 
                     printf("Backgrounded Process: %d\n", child); fflush(stdout);
 
+
                     // Redirect stdin and stdout to /dev/null for background processes
-                    // dup2(null_file, 1);
+                    dup2(null_file, 1);
                     // dup2(null_file, 0);
 
-                    for(int i = 0; i < background_process_index; i++) {
-
-                        pid_t result = waitpid(background_processes[i], &last_status, WNOHANG);
-                        if (result == 0) {
-
-                            printf("Process Completed: %d\n", background_processes[i]); fflush(stdout);
-                            for(int x = i; x < background_process_index - 1; x++) {
-                                background_processes[x] = background_processes[x + 1];
-                            }
-
-                            background_processes[background_process_index - 2] = 0;
-                        }
-                    }
                 }
             }
             else
@@ -181,12 +175,85 @@ int main(int argc, char *argv[])
                 printf("Command ran: %d\n", result);
             }
         }
+
+        for (int i = 0; i < background_process_index; i++)
+        {
+
+            pid_t result = waitpid(background_processes[i], &last_status, WNOHANG);
+            if (result == 0)
+            {
+
+                printf("Process Completed: %d\n", background_processes[i]);
+                fflush(stdout);
+                for (int x = i; x < background_process_index - 1; x++)
+                {
+                    background_processes[x] = background_processes[x + 1];
+                }
+
+                background_processes[background_process_index - 2] = 0;
+            }
+        }
     }
 
     free(command);
     free(tokenizer_buffer);
 
     return 0;
+}
+
+int get_input_redirection(char *buffer[], int *buffer_length) {
+
+    int found = 0;
+    for(int i = 0; i < *buffer_length - 1; i++) {
+
+        if (strcmp(buffer[i], "<") == 0) {
+            found = i;
+        }
+
+    }
+
+    int file_desc = open(buffer[found + 1], O_WRONLY);
+
+    for(int i = found; i < *buffer_length - 2; i++) {
+
+        buffer[i] = buffer[i + 2];
+
+    }
+
+    buffer[*buffer_length - 2] = NULL;
+    buffer[*buffer_length - 1] = NULL;
+
+    buffer_length = buffer_length - 2;
+    return file_desc;
+
+
+}
+
+int get_output_redirection(char *buffer[], int *buffer_length) {
+
+    int found = 0;
+    for (int i = 0; i < *buffer_length - 1; i++)
+    {
+
+        if (strcmp(buffer[i], ">") == 0)
+        {
+            found = i;
+        }
+    }
+
+    int file_desc = open(buffer[found + 1], O_WRONLY);
+
+    for (int i = found; i < *buffer_length - 2; i++)
+    {
+
+        buffer[i] = buffer[i + 2];
+    }
+
+    buffer[*buffer_length - 2] = NULL;
+    buffer[*buffer_length - 1] = NULL;
+
+    buffer_length = buffer_length - 2;
+    return file_desc;
 }
 
 void prompt_and_read(char *buffer)
