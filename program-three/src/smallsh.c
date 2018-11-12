@@ -105,9 +105,7 @@ int main(int argc, char *argv[])
             char *token;
             char *args[512];
             memset(args, '\0', 512);
-            for(int i = 0; i < 512; i++) {
-                memset(args[i], '\0', 10);
-            }
+
             // printf("Memset the Args\n"); fflush(stdout);
             int arg_index = 0;
             args[arg_index++] = program_name;
