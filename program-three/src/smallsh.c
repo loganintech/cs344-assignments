@@ -212,7 +212,13 @@ int get_input_redirection(char *buffer[], int *buffer_length) {
 
     }
 
-    int file_desc = open(buffer[found + 1], O_WRONLY);
+    int file_desc;
+
+    if (found != 0) {
+        file_desc = open(buffer[found + 1], O_RDONLY);
+    } else {
+        file_desc = open("/dev/null", O_RDONLY);
+    }
 
     for(int i = found; i < *buffer_length - 2; i++) {
 
@@ -241,7 +247,16 @@ int get_output_redirection(char *buffer[], int *buffer_length) {
         }
     }
 
-    int file_desc = open(buffer[found + 1], O_WRONLY);
+    int file_desc;
+
+    if (found != 0)
+    {
+        file_desc = open(buffer[found + 1], O_WRONLY);
+    }
+    else
+    {
+        file_desc = open("/dev/null", O_WRONLY);
+    }
 
     for (int i = found; i < *buffer_length - 2; i++)
     {
