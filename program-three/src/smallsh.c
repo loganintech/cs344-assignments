@@ -164,12 +164,28 @@ int main(int argc, char *argv[])
                 int output_descriptor = get_output_redirection(args, &arg_index);
                 // printf("Arg Index: %d\n", arg_index); fflush(stdout);
 
+                if (output_descriptor < 0)
+                {
+                    printf("Couldn't open file for writing.\n");
+                    fflush(stdout);
+                    return;
+                }
+
+                if (input_descriptor < 0)
+                {
+                    printf("Couldn't open file for reading.\n");
+                    fflush(stdout);
+                    return;
+                }
+
                 dup2(input_descriptor, 0);
                 dup2(output_descriptor, 1);
 
                 int result = execvp(program_name, args);
                 close(output_descriptor);
                 close(input_descriptor);
+
+                return result;
                 // printf("Command ran: %d\n", result);
             }
         }
