@@ -169,8 +169,7 @@ int main(int argc, char *argv[])
                 // printf("Arg Index: %d\n", arg_index); fflush(stdout);
 
                 if (input_descriptor < 0 || output_descriptor < 0) {
-                    printf("Couldn't use negative descriptors."); fflush(stdout);
-                    return 1;
+                    exit(1);
                 }
 
                 dup2(input_descriptor, 0);
