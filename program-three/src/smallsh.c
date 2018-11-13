@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
 
                 if (!WIFEXITED(last_status))
                 {
-                    printf("Process exited with signal: %d\n", WIFSIGNALED(last_status));
+                    printf("Process %d exited with signal: %d\n", result, WIFSIGNALED(last_status));
                 } else {
                     printf("Process %d completed with status %d\n", result, last_status);
                 }
