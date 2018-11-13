@@ -194,10 +194,10 @@ int main(int argc, char *argv[])
         {
 
             pid_t result = waitpid(background_processes[i], &last_status, WNOHANG);
-            if (result == 0)
+            if (result > 0)
             {
 
-                printf("Process %d completed with status %d\n", background_processes[i], last_status);
+                printf("Process %d - %d completed with status %d\n", background_processes[i], result, last_status);
                 fflush(stdout);
                 for (int x = i; x < background_process_index - 1; x++)
                 {
@@ -303,11 +303,21 @@ void prompt_and_read(char *buffer)
 
     fgets(buffer, 2048, stdin);
 
-    char* pidPos = strstr(buffer, "$$");
-    
-    if(pidPos != NULL) {
-        buffer[pidPos - buffer] = '\0'
-	
+    char* pid_pos = strstr(buffer, "$$");
+
+    int pid_index = pid_pos - buffer;
+    int buffer_len = strlen(buffer);
+    if(pid_pos != NULL) {
+        buffer[pid_pos - buffer] = '\0';
+        if (pid_index > buffer_len - 2) {
+            pid_t a_pid = getpid();
+            char pid_str[10];
+            memset(pid_str, '\0', 10);
+            sprintf(pid_str, "%d", a_pid);
+            strcat(buffer, pid_str);
+        }
+    }
+
 
     char *newpos = strchr(buffer, '\n');
     *newpos = '\0';
