@@ -22,6 +22,7 @@ const char *cmd_delim = " ";
 void prompt_and_read(char *buffer);
 int get_input_redirection(char *buffer[], int *buffer_length);
 int get_output_redirection(char **buffer, int *buffer_length);
+void handle_sig(int sig);
 
 int main(int argc, char *argv[])
 {
