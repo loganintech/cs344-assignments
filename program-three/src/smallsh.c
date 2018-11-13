@@ -350,6 +350,7 @@ void handle_sig(int sig) {
             foreground_only = true;
         } else {
             printf("Exiting foreground only mode.\n");
+            foreground_only = false;
         }
     }
 }
