@@ -18,6 +18,7 @@
 
 char prompt_string = ':';
 const char *cmd_delim = " ";
+bool foreground_only = false;
 
 void prompt_and_read(char *buffer);
 int get_input_redirection(char *buffer[], int *buffer_length);
@@ -126,11 +127,6 @@ int main(int argc, char *argv[])
                 {
                     continue;
                 }
-                if (strcmp(token, "$$") == 0)
-                {
-                    sprintf(pid_token, "%d", parent);
-                    args[arg_index++] = pid_token;
-                }
                 else
                 {
                     args[arg_index++] = token;
@@ -147,7 +143,7 @@ int main(int argc, char *argv[])
             else if (child > 0)
             {
                 //In the parent
-                if (args[arg_index - 1][0] != '&') {
+                if (foreground_only || args[arg_index - 1][0] != '&') {
                     waitpid(child, &last_status, 0);
                 }
                 else {
@@ -158,7 +154,6 @@ int main(int argc, char *argv[])
             }
             else
             {
-                //In the child
                 if (args[arg_index - 1][0] == '&') {
                     args[--arg_index] = NULL;
                 }
