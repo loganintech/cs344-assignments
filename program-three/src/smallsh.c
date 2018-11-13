@@ -51,6 +51,10 @@ int main(int argc, char *argv[])
         char *program_name = strtok_r(command, cmd_delim, &tokenizer_buffer);
         // printf("Program Name: '%s'\n", program_name); fflush(stdout);
 
+        if(program_name == NULL) {
+            continue;
+        }
+
         if (strcmp(program_name, "exit") == 0)
         {
             exit(0);
