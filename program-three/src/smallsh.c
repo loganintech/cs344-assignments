@@ -303,6 +303,12 @@ void prompt_and_read(char *buffer)
 
     fgets(buffer, 2048, stdin);
 
+    char* pidPos = strstr(buffer, "$$");
+    
+    if(pidPos != NULL) {
+        buffer[pidPos - buffer] = '\0'
+	
+
     char *newpos = strchr(buffer, '\n');
     *newpos = '\0';
 }
