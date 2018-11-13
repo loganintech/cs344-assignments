@@ -338,7 +338,10 @@ void prompt_and_read(char *buffer)
 }
 
 void handle_sig(int sig) {
-    if (sig == 20) {
+    if (sig == 1) {
+
+    }
+    else if (sig == 20) {
         if(!foreground_only) {
             printf("Entering foreground only mode.");
             foreground_only = true;
