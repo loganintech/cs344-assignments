@@ -145,6 +145,9 @@ int main(int argc, char *argv[])
                 //In the parent
                 if (foreground_only || args[arg_index - 1][0] != '&') {
                     waitpid(child, &last_status, 0);
+                    if(!WIFEXITED(last_status)) {
+                        printf("Process exited with signal: %d\n", WIFSIGNALED(last_status));
+                    }
                 }
                 else {
                     background_processes[background_process_index++] = child;
@@ -197,7 +200,12 @@ int main(int argc, char *argv[])
             if (result > 0)
             {
 
-                printf("Process %d completed with status %d\n", result, last_status);
+                if (!WIFEXITED(last_status))
+                {
+                    printf("Process exited with signal: %d\n", WIFSIGNALED(last_status));
+                } else {
+                    printf("Process %d completed with status %d\n", result, last_status);
+                }
                 fflush(stdout);
                 for (int x = i; x < background_process_index - 1; x++)
                 {
@@ -331,4 +339,15 @@ void prompt_and_read(char *buffer)
 
 void handle_sig(int sig) {
     printf("Caught signal: %d\n", sig);
+
+    if(sig == 2) {
+
+    } else if (sig == 20) {
+        if(!foreground_only) {
+            printf("Entering foreground only mode.");
+            foreground_only = true;
+        } else {
+            pritnf("Exiting foreground only mode.");
+        }
+    }
 }
