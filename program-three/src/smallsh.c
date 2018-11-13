@@ -182,8 +182,6 @@ int main(int argc, char *argv[])
                 return result;
                 // printf("Command ran: %d\n", result);
             }
-        } else {
-            printf("\n");
         }
 
         for (int i = 0; i < background_process_index; i++)
