@@ -99,8 +99,6 @@ int main(int argc, char *argv[])
         }
         else if (strcmp(program_name, "status") == 0)
         {
-            printf("CWD: %s\n", cwd);
-            fflush(stdout);
             printf("Last Exited Status: %d\n", last_status);
             fflush(stdout);
         }
