@@ -6,11 +6,11 @@
 #include <string.h>
 #include <limits.h>
 #include <pthread.h>
-#include <pthread.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#include <signal.h>
 
 #define true 1
 #define false 0
@@ -25,7 +25,7 @@ int get_output_redirection(char **buffer, int *buffer_length);
 
 int main(int argc, char *argv[])
 {
-
+    signal(SIGINT, handle_sig);
     int null_file = open("/dev/null", O_WRONLY);
     char cwd[2048];
     pid_t background_processes[512];
@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
             if (result > 0)
             {
 
-                printf("Process %d - %d completed with status %d\n", background_processes[i], result, last_status);
+                printf("Process %d completed with status %d\n", result, last_status);
                 fflush(stdout);
                 for (int x = i; x < background_process_index - 1; x++)
                 {
@@ -327,4 +327,8 @@ void prompt_and_read(char *buffer)
     if(newpos != NULL) {
         *newpos = '\0';
     }
+}
+
+void handle_sig(int sig) {
+    printf("Caught signal: %d\n", sig);
 }
