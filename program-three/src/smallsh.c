@@ -340,14 +340,14 @@ void prompt_and_read(char *buffer)
 
 void handle_sig(int sig) {
     if (sig == 2) {
-
+        printf("Caught SIGINT\n");
     }
     else if (sig == 20) {
         if(!foreground_only) {
-            printf("Entering foreground only mode.");
+            printf("Entering foreground only mode.\n");
             foreground_only = true;
         } else {
-            printf("Exiting foreground only mode.");
+            printf("Exiting foreground only mode.\n");
         }
     }
 }
