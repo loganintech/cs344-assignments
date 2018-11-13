@@ -311,7 +311,7 @@ void prompt_and_read(char *buffer)
         buffer[pid_pos - buffer] = '\0';
         if (pid_index > buffer_len - 2) {
             pid_t a_pid = getpid();
-            char pid_str[10];
+            char* pid_str = malloc(sizeof(char) * 10);
             memset(pid_str, '\0', 10);
             sprintf(pid_str, "%d", a_pid);
             strcat(buffer, pid_str);
