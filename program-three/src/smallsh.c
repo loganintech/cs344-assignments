@@ -317,7 +317,9 @@ void prompt_and_read(char *buffer)
             pid_t a_pid = getpid();
             char* pid_str = malloc(sizeof(char) * 10);
             memset(pid_str, '\0', 10);
+            printf("Pid Str: %s", pid_str);
             sprintf(pid_str, "%d", a_pid);
+            printf("Pid Str: %s", pid_str);
             strcat(buffer, pid_str);
         }
     }
