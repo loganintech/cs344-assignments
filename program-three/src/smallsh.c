@@ -321,20 +321,15 @@ void prompt_and_read(char *buffer)
             pid_t a_pid = getpid();
             char* pid_str = malloc(sizeof(char) * 10);
             memset(pid_str, '\0', 10);
-            printf("Pid Str: %s\n", pid_str);
             sprintf(pid_str, "%d", a_pid);
-            printf("Pid Str: %s\n", pid_str);
-            printf("Buffer Before PID_STR: '%s'", buffer);
             strcat(buffer, pid_str);
-            printf("Buffer After PID_STR: '%s'", buffer);
             strcat(buffer, after_pid_replace);
-            printf("Buffer After Additional: '%s'", buffer);
         }
     }
 
-    printf("Buffer: '%s'", buffer);
     char *newpos = strchr(buffer, '\n');
     if(newpos != NULL) {
         *newpos = '\0';
     }
+    printf("Buffer: '%s'\n", buffer);
 }
