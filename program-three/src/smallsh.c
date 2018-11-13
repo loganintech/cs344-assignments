@@ -28,6 +28,7 @@ void handle_sig(int sig);
 int main(int argc, char *argv[])
 {
     signal(SIGINT, handle_sig);
+    signal(SIGTSTP, handle_sig);
     int null_file = open("/dev/null", O_WRONLY);
     char cwd[2048];
     pid_t background_processes[512];
@@ -338,7 +339,7 @@ void prompt_and_read(char *buffer)
 }
 
 void handle_sig(int sig) {
-    if (sig == 1) {
+    if (sig == 2) {
 
     }
     else if (sig == 20) {
