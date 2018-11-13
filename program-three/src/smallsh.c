@@ -168,22 +168,6 @@ int main(int argc, char *argv[])
                 int output_descriptor = get_output_redirection(args, &arg_index);
                 // printf("Arg Index: %d\n", arg_index); fflush(stdout);
 
-                if (output_descriptor < 0)
-                {
-                    printf("Couldn't open file for writing.\n");
-                    fflush(stdout);
-                    last_status = 1;
-                    return 1;
-                }
-
-                if (input_descriptor < 0)
-                {
-                    printf("Couldn't open file for reading.\n");
-                    fflush(stdout);
-                    last_status = 1;
-                    return 1;
-                }
-
                 dup2(input_descriptor, 0);
                 dup2(output_descriptor, 1);
 
@@ -250,6 +234,15 @@ int get_input_redirection(char **buffer, int *buffer_length)
     if (found != 0)
     {
         file_desc = open(buffer[found + 1], O_RDONLY, 0667);
+
+        if (file_desc < 0)
+        {
+            printf("Couldn't open file for reading.\n");
+            fflush(stdout);
+            last_status = 1;
+            file_desc = open("/dev/null", O_RDONLY);
+            return file_desc;
+        }
     }
     else
     {
@@ -288,6 +281,14 @@ int get_output_redirection(char **buffer, int *buffer_length) {
     if (found != 0)
     {
         file_desc = open(buffer[found + 1], O_WRONLY | O_CREAT, 0667);
+
+        if (file_desc < 0)
+        {
+            printf("Couldn't open file for writing.\n");
+            fflush(stdout);
+            last_status = 1;
+            return 1;
+        }
     }
     else
     {
