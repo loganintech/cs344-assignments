@@ -315,6 +315,9 @@ void prompt_and_read(char *buffer)
         printf("Buffer: %s\n", buffer);
         buffer[pid_index] = '\0';
         if (pid_index > buffer_len - 2) {
+            char* after_pid_replace = malloc(sizeof(char) * 2048);
+            memset(after_pid_replace, '\0', 2048);
+            strcpy(after_pid_replace, buffer + pid_index + 2);
             pid_t a_pid = getpid();
             char* pid_str = malloc(sizeof(char) * 10);
             memset(pid_str, '\0', 10);
@@ -322,6 +325,7 @@ void prompt_and_read(char *buffer)
             sprintf(pid_str, "%d", a_pid);
             printf("Pid Str: %s\n", pid_str);
             strcat(buffer, pid_str);
+            strcat(buffer, after_pid_replace);
         }
     }
 
