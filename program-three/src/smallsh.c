@@ -168,14 +168,14 @@ int main(int argc, char *argv[])
                 {
                     printf("Couldn't open file for writing.\n");
                     fflush(stdout);
-                    return;
+                    return -1;
                 }
 
                 if (input_descriptor < 0)
                 {
                     printf("Couldn't open file for reading.\n");
                     fflush(stdout);
-                    return;
+                    return -1;
                 }
 
                 dup2(input_descriptor, 0);
@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
             if (result == 0)
             {
 
-                printf("Process Completed: %d\n", background_processes[i]);
+                printf("Process %d completed with status %d\n", background_processes[i], last_status);
                 fflush(stdout);
                 for (int x = i; x < background_process_index - 1; x++)
                 {
