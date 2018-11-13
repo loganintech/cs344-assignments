@@ -312,14 +312,15 @@ void prompt_and_read(char *buffer)
     printf("Buffer Len: %d\n", buffer_len);
 
     if(pid_pos != NULL) {
+        printf("Buffer: %s\n", buffer);
         buffer[pid_index] = '\0';
         if (pid_index > buffer_len - 2) {
             pid_t a_pid = getpid();
             char* pid_str = malloc(sizeof(char) * 10);
             memset(pid_str, '\0', 10);
-            printf("Pid Str: %s", pid_str);
+            printf("Pid Str: %s\n", pid_str);
             sprintf(pid_str, "%d", a_pid);
-            printf("Pid Str: %s", pid_str);
+            printf("Pid Str: %s\n", pid_str);
             strcat(buffer, pid_str);
         }
     }
