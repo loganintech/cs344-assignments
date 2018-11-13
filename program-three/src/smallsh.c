@@ -19,6 +19,7 @@
 char prompt_string = ':';
 const char *cmd_delim = " ";
 bool foreground_only = false;
+int last_status = 0;
 
 void prompt_and_read(char *buffer);
 int get_input_redirection(char *buffer[], int *buffer_length);
@@ -38,7 +39,6 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Couldn't read current working directory.");
         fflush(stderr);
     }
-    int last_status = 0;
     char *command = malloc(sizeof(char) * 2048);
     char *tokenizer_buffer = malloc(sizeof(char) * 2048);
 
