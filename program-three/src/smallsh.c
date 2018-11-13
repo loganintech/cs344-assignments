@@ -308,11 +308,7 @@ void prompt_and_read(char *buffer)
     int pid_index = pid_pos - buffer;
     int buffer_len = strlen(buffer);
 
-    printf("Pid Index: %d\n", pid_index);
-    printf("Buffer Len: %d\n", buffer_len);
-
     if(pid_pos != NULL) {
-        printf("Buffer: %s\n", buffer);
         buffer[pid_index] = '\0';
         if (pid_index < buffer_len - 2) {
             char* after_pid_replace = malloc(sizeof(char) * 2048);
@@ -331,5 +327,4 @@ void prompt_and_read(char *buffer)
     if(newpos != NULL) {
         *newpos = '\0';
     }
-    printf("Buffer: '%s'\n", buffer);
 }
