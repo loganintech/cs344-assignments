@@ -314,7 +314,7 @@ void prompt_and_read(char *buffer)
     if(pid_pos != NULL) {
         printf("Buffer: %s\n", buffer);
         buffer[pid_index] = '\0';
-        if (pid_index > buffer_len - 2) {
+        if (pid_index < buffer_len - 2) {
             char* after_pid_replace = malloc(sizeof(char) * 2048);
             memset(after_pid_replace, '\0', 2048);
             strcpy(after_pid_replace, buffer + pid_index + 2);
