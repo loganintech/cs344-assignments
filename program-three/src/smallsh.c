@@ -307,8 +307,12 @@ void prompt_and_read(char *buffer)
 
     int pid_index = pid_pos - buffer;
     int buffer_len = strlen(buffer);
+
+    printf("Pid Index: %d\n", pid_index);
+    printf("Buffer Len: %d\n", buffer_len);
+
     if(pid_pos != NULL) {
-        buffer[pid_pos - buffer] = '\0';
+        buffer[pid_index] = '\0';
         if (pid_index > buffer_len - 2) {
             pid_t a_pid = getpid();
             char* pid_str = malloc(sizeof(char) * 10);
