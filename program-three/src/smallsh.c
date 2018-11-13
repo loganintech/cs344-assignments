@@ -172,14 +172,16 @@ int main(int argc, char *argv[])
                 {
                     printf("Couldn't open file for writing.\n");
                     fflush(stdout);
-                    return -1;
+                    last_status = 1;
+                    return 1;
                 }
 
                 if (input_descriptor < 0)
                 {
                     printf("Couldn't open file for reading.\n");
                     fflush(stdout);
-                    return -1;
+                    last_status = 1;
+                    return 1;
                 }
 
                 dup2(input_descriptor, 0);
