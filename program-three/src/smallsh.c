@@ -343,7 +343,7 @@ void handle_sig(int sig) {
             printf("Entering foreground only mode.");
             foreground_only = true;
         } else {
-            pritnf("Exiting foreground only mode.");
+            printf("Exiting foreground only mode.");
         }
     }
 }
