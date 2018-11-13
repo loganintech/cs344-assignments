@@ -324,11 +324,11 @@ void prompt_and_read(char *buffer)
             printf("Pid Str: %s\n", pid_str);
             sprintf(pid_str, "%d", a_pid);
             printf("Pid Str: %s\n", pid_str);
-            pritnf("Buffer Before PID_STR: '%s'", buffer);
+            printf("Buffer Before PID_STR: '%s'", buffer);
             strcat(buffer, pid_str);
-            pritnf("Buffer After PID_STR: '%s'", buffer);
+            printf("Buffer After PID_STR: '%s'", buffer);
             strcat(buffer, after_pid_replace);
-            pritnf("Buffer After Additional: '%s'", buffer);
+            printf("Buffer After Additional: '%s'", buffer);
         }
     }
 
