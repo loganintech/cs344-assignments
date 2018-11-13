@@ -329,7 +329,7 @@ void prompt_and_read(char *buffer)
         }
     }
 
-
+    printf("Buffer: '%s'", buffer);
     char *newpos = strchr(buffer, '\n');
     *newpos = '\0';
 }
