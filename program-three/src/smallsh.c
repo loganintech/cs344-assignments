@@ -352,6 +352,7 @@ void prompt_and_read(char *buffer)
 
 void handle_sig(int sig) {
     if (sig == 2) {
+        fprintf(stdout, "\n"); fflush(stdout);
         signal(SIGINT, handle_sig);
     }
     else if (sig == 20) {
