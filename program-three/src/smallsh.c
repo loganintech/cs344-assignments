@@ -44,6 +44,32 @@ int main(int argc, char *argv[])
 
     while (true)
     {
+        for (int i = 0; i < background_process_index; i++)
+        {
+
+            pid_t result = waitpid(background_processes[i], &last_status, WNOHANG);
+            if (result > 0)
+            {
+
+                if (!WIFEXITED(last_status))
+                {
+                    fprintf(stdout, "Process %d exited with signal: %d\n", result, WIFSIGNALED(last_status));
+                }
+                else
+                {
+                    fprintf(stdout, "Process %d completed with status: %d\n", result, last_status);
+                }
+                fflush(stdout);
+
+                for (int x = i; x < background_process_index - 1; x++)
+                {
+                    background_processes[x] = background_processes[x + 1];
+                }
+
+                background_processes[background_process_index - 2] = 0;
+            }
+        }
+
         memset(command, '\0', sizeof(command));
         memset(tokenizer_buffer, '\0', sizeof(tokenizer_buffer));
 
@@ -186,30 +212,6 @@ int main(int argc, char *argv[])
 
                 return result;
                 // fprintf(stdout, "Command ran: %d\n", result);
-            }
-        }
-
-        for (int i = 0; i < background_process_index; i++)
-        {
-
-            pid_t result = waitpid(background_processes[i], &last_status, WNOHANG);
-            if (result > 0)
-            {
-
-                if (!WIFEXITED(last_status))
-                {
-                    fprintf(stdout, "Process %d exited with signal: %d\n", result, WIFSIGNALED(last_status));
-                } else {
-                    fprintf(stdout, "Process %d completed with status: %d\n", result, last_status);
-                }
-                fflush(stdout);
-
-                for (int x = i; x < background_process_index - 1; x++)
-                {
-                    background_processes[x] = background_processes[x + 1];
-                }
-
-                background_processes[background_process_index - 2] = 0;
             }
         }
     }
