@@ -49,9 +49,9 @@ int main(int argc, char *argv[])
 
         prompt_and_read(command);
 
-        // printf("Input: '%s'\n", command); fflush(stdout);
+        // fprintf(stdout, "Input: '%s'\n", command); fflush(stdout);
         char *program_name = strtok_r(command, cmd_delim, &tokenizer_buffer);
-        // printf("Program Name: '%s'\n", program_name); fflush(stdout);
+        // fprintf(stdout, "Program Name: '%s'\n", program_name); fflush(stdout);
 
         if(program_name == NULL) {
             continue;
@@ -99,26 +99,33 @@ int main(int argc, char *argv[])
         }
         else if (strcmp(program_name, "status") == 0)
         {
-            printf("Last Exited Status: %d\n", last_status);
+            if (!WIFEXITED(last_status))
+            {
+                fprintf(stdout, "Latest process exited with signal: %d\n", WIFSIGNALED(last_status));
+            }
+            else
+            {
+                fprintf(stdout, "Latest process completed with status: %d\n", last_status);
+            }
             fflush(stdout);
         }
         else if (program_name[0] != '#')
         {
-            // printf("Getting PID\n"); fflush(stdout);
+            // fprintf(stdout, "Getting PID\n"); fflush(stdout);
             pid_t parent = getpid();
 
             char *token;
             char *args[512];
             memset(args, '\0', 512);
 
-            // printf("Memset the Args\n"); fflush(stdout);
+            // fprintf(stdout, "Memset the Args\n"); fflush(stdout);
             int arg_index = 0;
             args[arg_index++] = program_name;
 
             char pid_token[8];
             memset(pid_token, '\0', 8);
 
-            // printf("Memset PID_token\n"); fflush(stdout);
+            // fprintf(stdout, "Memset PID_token\n"); fflush(stdout);
 
             while (token = (char*) strtok_r(NULL, cmd_delim, &tokenizer_buffer))
             {
@@ -145,13 +152,13 @@ int main(int argc, char *argv[])
                 if (foreground_only || args[arg_index - 1][0] != '&') {
                     waitpid(child, &last_status, 0);
                     if(!WIFEXITED(last_status)) {
-                        printf("Process exited with signal: %d\n", WIFSIGNALED(last_status));
+                        fprintf(stdout, "Process exited with signal: %d\n", WIFSIGNALED(last_status)); fflush(stdout);
                     }
                 }
                 else {
                     background_processes[background_process_index++] = child;
 
-                    printf("Backgrounded Process: %d\n", child); fflush(stdout);
+                    fprintf(stdout, "Backgrounded Process: %d\n", child); fflush(stdout);
                 }
             }
             else
@@ -159,12 +166,12 @@ int main(int argc, char *argv[])
                 if (args[arg_index - 1][0] == '&') {
                     args[--arg_index] = NULL;
                 }
-                // printf("Program Name: '%s'\n", program_name);
+                // fprintf(stdout, "Program Name: '%s'\n", program_name);
 
                 int input_descriptor = get_input_redirection(args, &arg_index);
-                // printf("Arg Index: %d\n", arg_index); fflush(stdout);
+                // fprintf(stdout, "Arg Index: %d\n", arg_index); fflush(stdout);
                 int output_descriptor = get_output_redirection(args, &arg_index);
-                // printf("Arg Index: %d\n", arg_index); fflush(stdout);
+                // fprintf(stdout, "Arg Index: %d\n", arg_index); fflush(stdout);
 
                 if (input_descriptor < 0 || output_descriptor < 0) {
                     exit(1);
@@ -178,7 +185,7 @@ int main(int argc, char *argv[])
                 close(input_descriptor);
 
                 return result;
-                // printf("Command ran: %d\n", result);
+                // fprintf(stdout, "Command ran: %d\n", result);
             }
         }
 
@@ -191,11 +198,12 @@ int main(int argc, char *argv[])
 
                 if (!WIFEXITED(last_status))
                 {
-                    printf("Process %d exited with signal: %d\n", result, WIFSIGNALED(last_status));
+                    fprintf(stdout, "Process %d exited with signal: %d\n", result, WIFSIGNALED(last_status));
                 } else {
-                    printf("Process %d completed with status %d\n", result, last_status);
+                    fprintf(stdout, "Process %d completed with status: %d\n", result, last_status);
                 }
                 fflush(stdout);
+
                 for (int x = i; x < background_process_index - 1; x++)
                 {
                     background_processes[x] = background_processes[x + 1];
@@ -215,14 +223,14 @@ int main(int argc, char *argv[])
 int get_input_redirection(char **buffer, int *buffer_length)
 {
 
-    // printf("Buffer Len: %d\n", *buffer_length);
-    fflush(stdout);
+    // fprintf(stdout, "Buffer Len: %d\n", *buffer_length);
+    // fflush(stdout);
 
     int found = 0;
     for (int i = 0; i < (*buffer_length) - 1; i++)
     {
-        // printf("Checking buffer: %s\n", buffer[i]);
-        fflush(stdout);
+        // fprintf(stdout, "Checking buffer: %s\n", buffer[i]);
+        // fflush(stdout);
         if (strcmp(buffer[i], "<") == 0)
         {
             found = i;
@@ -237,7 +245,7 @@ int get_input_redirection(char **buffer, int *buffer_length)
 
         if (file_desc < 0)
         {
-            printf("Couldn't open file for reading.\n");
+            fprintf(stdout, "Couldn't open file for reading.\n");
             fflush(stdout);
             last_status = 1;
             return -1;
@@ -263,12 +271,12 @@ int get_input_redirection(char **buffer, int *buffer_length)
 }
 int get_output_redirection(char **buffer, int *buffer_length) {
 
-    // printf("Buffer Len: %d\n", *buffer_length); fflush(stdout);
+    // fprintf(stdout, "Buffer Len: %d\n", *buffer_length); fflush(stdout);
 
     int found = 0;
     for (int i = 0; i < (*buffer_length) - 1; i++)
     {
-        // printf("Checking buffer: %s\n", buffer[i]); fflush(stdout);
+        // fprintf(stdout, "Checking buffer: %s\n", buffer[i]); fflush(stdout);
         if (strcmp(buffer[i], ">") == 0)
         {
             found = i;
@@ -283,7 +291,7 @@ int get_output_redirection(char **buffer, int *buffer_length) {
 
         if (file_desc < 0)
         {
-            printf("Couldn't open file for writing.\n");
+            fprintf(stdout, "Couldn't open file for writing.\n");
             fflush(stdout);
             last_status = 1;
             return -1;
@@ -311,7 +319,7 @@ int get_output_redirection(char **buffer, int *buffer_length) {
 void prompt_and_read(char *buffer)
 {
 
-    printf("%c ", prompt_string);
+    fprintf(stdout, "%c ", prompt_string);
     fflush(stdout);
 
     fgets(buffer, 2048, stdin);
@@ -345,15 +353,14 @@ void prompt_and_read(char *buffer)
 void handle_sig(int sig) {
     if (sig == 2) {
         signal(SIGINT, handle_sig);
-        printf("Caught SIGINT\n");
     }
     else if (sig == 20) {
         signal(SIGTSTP, handle_sig);
         if(!foreground_only) {
-            printf("Entering foreground only mode.\n");
+            fprintf(stdout, "Entering foreground only mode.\n"); fflush(stdout);
             foreground_only = true;
         } else {
-            printf("Exiting foreground only mode.\n");
+            fprintf(stdout, "Exiting foreground only mode.\n"); fflush(stdout);
             foreground_only = false;
         }
     }
