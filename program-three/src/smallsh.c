@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    fprintf(stdout, "Process %d completed with status: %d\n", result, last_status);
+                    fprintf(stdout, "Process %d completed with status: %d\n", result, WEXITSTATUS(last_status));
                 }
                 fflush(stdout);
 
@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-                fprintf(stdout, "Latest process completed with status: %d\n", last_status);
+                fprintf(stdout, "Latest process completed with status: %d\n", WEXITSTATUS(last_status));
             }
             fflush(stdout);
         }
